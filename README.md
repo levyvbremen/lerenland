@@ -17,7 +17,26 @@ Runs on `localhost:5002` as a Flask app.
 - Built for low friction use on school laptops and home tablets
 
 ## Screenshots
-_Coming soon. Game selection screen, sample game, progress dashboard._
+
+Home with game selection:
+
+![Home](./screenshots/home.png)
+
+RekenRaket (math game):
+
+![RekenRaket](./screenshots/game-reken.png)
+
+TafelTijger (multiplication tables):
+
+![TafelTijger](./screenshots/game-tafels.png)
+
+WoordenWolk (vocabulary):
+
+![WoordenWolk](./screenshots/game-woorden.png)
+
+SpellingsSafari (spelling):
+
+![SpellingsSafari](./screenshots/game-spelling.png)
 
 ## Status
 Private during development. May open source the framework once the first cohort of kids has tested it.
