@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>LerenLand 🌈</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Nunito',system-ui,sans-serif;background:#87CEEB;min-height:100vh;overflow-x:hidden;position:relative;}
+
+    /* SKY */
+    .sky{position:fixed;inset:0;z-index:0;background:linear-gradient(180deg,#4FC3F7 0%,#81D4FA 40%,#B3E5FC 70%,#E1F5FE 100%);}
+    .wolk{position:fixed;background:white;border-radius:50px;opacity:0.85;animation:drijf linear infinite;}
+    @keyframes drijf{0%{transform:translateX(-300px)}100%{transform:translateX(110vw)}}
+    .gras{position:fixed;bottom:0;left:0;right:0;height:80px;background:linear-gradient(180deg,#66BB6A,#388E3C);z-index:0;border-radius:60% 60% 0 0 / 30px 30px 0 0;}
+    .gras::before{content:'';position:absolute;top:-20px;left:0;right:0;height:30px;background:radial-gradient(ellipse at 50% 100%,#66BB6A 60%,transparent 70%);background-size:40px 30px;}
+    .deco{position:fixed;font-size:2rem;animation:wiebel 2s ease-in-out infinite;z-index:1;user-select:none;pointer-events:none;}
+    @keyframes wiebel{0%,100%{transform:rotate(-8deg)}50%{transform:rotate(8deg)}}
+
+    /* BEER LOPER */
+    .beer-loper{position:fixed;bottom:50px;pointer-events:none;z-index:2;user-select:none;animation:beerLopen 18s linear infinite;width:220px;height:220px;opacity:0.55;filter:drop-shadow(0 16px 32px rgba(0,0,0,0.35));}
+    .beer-bob{display:block;width:100%;height:100%;animation:beerBob 0.6s ease-in-out infinite;}
+    @keyframes beerLopen{0%{left:-260px;transform:scaleX(1);}49.9%{left:calc(100vw + 60px);transform:scaleX(1);}50%{left:calc(100vw + 60px);transform:scaleX(-1);}99.9%{left:-260px;transform:scaleX(-1);}100%{left:-260px;transform:scaleX(1);}}
+    @keyframes beerBob{0%,100%{transform:translateY(0) rotate(-3deg);}50%{transform:translateY(-18px) rotate(3deg);}}
+
+    /* CONTENT */
+    .content{position:relative;z-index:10;padding:20px 16px 120px;max-width:900px;margin:0 auto;}
+
+    /* HEADER */
+    .header{text-align:center;padding:20px 0 28px;}
+    .regenboog{font-size:5rem;display:block;animation:bounce-logo 1.5s ease-in-out infinite;filter:drop-shadow(0 4px 10px rgba(0,0,0,0.15));}
+    @keyframes bounce-logo{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-12px) rotate(3deg)}}
+    .titel{font-size:3.2rem;font-weight:900;color:white;text-shadow:0 4px 0 #f0a500,0 6px 0 rgba(0,0,0,0.15);letter-spacing:-1px;margin-bottom:8px;}
+    .sub{font-size:1rem;font-weight:700;background:white;color:#5c7cfa;display:inline-block;padding:6px 20px;border-radius:50px;box-shadow:0 3px 0 rgba(0,0,0,0.1);}
+
+    /* SECTIE LABEL */
+    .sectie-label{font-size:1rem;font-weight:900;color:white;text-shadow:0 2px 4px rgba(0,0,0,0.2);margin:22px 0 12px;display:flex;align-items:center;gap:8px;}
+    .sectie-label::before,.sectie-label::after{content:'';flex:1;height:2px;background:rgba(255,255,255,0.3);border-radius:2px;}
+
+    /* ── RIJ 1: KAARTEN MET GELIJK ICOON-BLOK ── */
+    .rij-top{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+    @media(max-width:500px){.rij-top{grid-template-columns:1fr;}}
+
+    /* Gedeelde kaart-stijl zodat beide identiek zijn */
+    .top-kaart{border-radius:24px;padding:0;box-shadow:0 6px 0 rgba(0,0,0,0.10);display:flex;flex-direction:column;overflow:hidden;height:100%;}
+    .kaart-icon-blok{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px 16px 14px;gap:4px;}
+    .kaart-groot-icon{font-size:2.6rem;line-height:1;}
+    .kaart-icon-label{font-size:0.65rem;font-weight:900;text-transform:uppercase;letter-spacing:1px;opacity:0.6;}
+    .kaart-body{padding:0 18px 18px;flex:1;display:flex;flex-direction:column;}
+
+    /* Naam kaart */
+    .naam-kaart{background:white;}
+    .naam-kaart .kaart-icon-blok{background:linear-gradient(135deg,#667EEA20,#764BA215);}
+    .naam-kaart .kaart-icon-label{color:#667EEA;}
+    .naam-waarde{font-size:1rem;font-weight:900;color:#333;margin-bottom:10px;}
+    .lt-grid{display:flex;gap:6px;flex-wrap:wrap;}
+    .lt-btn{background:#f0f0f0;border:3px solid transparent;border-radius:50%;width:40px;height:40px;color:#555;font-size:0.88rem;font-weight:900;cursor:pointer;transition:all 0.15s;font-family:'Nunito',sans-serif;}
+    .lt-btn.actief{background:#ffd700;border-color:#f0a500;color:#7a5000;transform:scale(1.15);}
+    .lt-btn:hover{transform:scale(1.1);}
+
+    /* Dagdoel kaart */
+    .doel-kaart{background:linear-gradient(145deg,#FFD700,#FF8C00);}
+    .doel-kaart .kaart-icon-blok{background:rgba(0,0,0,0.08);}
+    .doel-kaart .kaart-icon-label{color:rgba(0,0,0,0.45);}
+    .doel-kaart .kaart-body{justify-content:center;}
+    .doel-tekst{font-size:1rem;font-weight:900;color:white;text-shadow:0 1px 0 rgba(0,0,0,0.15);}
+    .doel-sub{font-size:0.78rem;font-weight:700;color:rgba(255,255,255,0.85);margin-top:4px;}
+    .doel-bar-wrap{background:rgba(0,0,0,0.18);border-radius:20px;height:10px;margin-top:12px;overflow:hidden;}
+    .doel-bar{background:white;height:100%;border-radius:20px;transition:width 0.8s cubic-bezier(.34,1.56,.64,1);}
+    .doel-kaart::after{content:'';} /* verwijder oude pseudo-element */
+
+    /* ── STREAK BANNER ── */
+    .streak-banner{background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:24px;padding:16px 22px;margin-bottom:14px;display:grid;grid-template-columns:repeat(4,1fr);gap:10px;box-shadow:0 6px 0 rgba(0,0,0,0.15);}
+    .streak-item{text-align:center;}
+    .streak-getal{font-size:2rem;font-weight:900;line-height:1;}
+    .streak-label{font-size:0.62rem;font-weight:800;text-transform:uppercase;letter-spacing:0.5px;color:rgba(255,255,255,0.45);margin-top:3px;}
+
+    /* ── BEER BANNER ── */
+    .beer-banner{background:linear-gradient(135deg,rgba(239,68,68,0.18),rgba(249,115,22,0.12));border:2px solid rgba(239,68,68,0.35);border-radius:24px;padding:18px 24px;margin-bottom:14px;display:flex;align-items:center;gap:16px;box-shadow:0 4px 0 rgba(239,68,68,0.1);}
+    .beer-banner-icon{font-size:3.2rem;animation:wiebel 1.5s ease-in-out infinite;flex-shrink:0;}
+    .beer-banner-midden{flex:1;text-align:center;}
+    .beer-banner-label{font-size:0.65rem;font-weight:800;text-transform:uppercase;letter-spacing:1px;color:rgba(239,68,68,0.9);margin-bottom:4px;}
+    .beer-banner-titel{font-size:1rem;font-weight:900;color:white;margin-bottom:3px;}
+    .beer-banner-sub{font-size:0.78rem;font-weight:700;color:rgba(255,255,255,0.65);}
+
+    /* ── SPELLEN ── */
+    .spellen-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px;}
+    .spel-kaart{border-radius:24px;padding:22px 18px 18px;cursor:pointer;text-decoration:none;color:white;display:block;overflow:hidden;position:relative;transition:transform 0.15s;box-shadow:0 6px 0 rgba(0,0,0,0.12);}
+    .spel-kaart:hover{transform:translateY(-3px);}
+    .spel-kaart:active{transform:scale(0.96) translateY(3px);box-shadow:0 2px 0 rgba(0,0,0,0.12);}
+    .spel-kaart.raken{background:linear-gradient(145deg,#FF6B6B,#FF8E53);}
+    .spel-kaart.tafels{background:linear-gradient(145deg,#667EEA,#764BA2);}
+    .spel-kaart.spelling{background:linear-gradient(145deg,#11998E,#38EF7D);}
+    .spel-kaart.woorden{background:linear-gradient(145deg,#F093FB,#F5576C);}
+    .spel-kaart.avontuur{background:linear-gradient(145deg,#F7971E,#FFD200);color:#1a1a2e;grid-column:1/-1;}
+    .spel-kaart.avontuur .spel-naam{color:#1a1a2e;}
+    .spel-kaart.avontuur .spel-beschrijving{color:#3a3a4e;}
+    .spel-kaart.avontuur .spel-record{color:#5a5a6e;}
+    .spel-kaart.avontuur .spel-sterren{color:#1a1a2e;}
+    .spel-bubble{position:absolute;top:-15px;right:-15px;width:80px;height:80px;border-radius:50%;background:rgba(255,255,255,0.15);}
+    .spel-bubble2{position:absolute;bottom:-20px;left:-10px;width:55px;height:55px;border-radius:50%;background:rgba(255,255,255,0.1);}
+    .spel-emoji{font-size:3rem;display:block;margin-bottom:10px;filter:drop-shadow(0 3px 6px rgba(0,0,0,0.2));animation:wiebel-spel 2.2s ease-in-out infinite;}
+    .spel-kaart:nth-child(2) .spel-emoji{animation-delay:0.4s;}
+    .spel-kaart:nth-child(3) .spel-emoji{animation-delay:0.8s;}
+    .spel-kaart:nth-child(4) .spel-emoji{animation-delay:1.2s;}
+    .spel-kaart:nth-child(5) .spel-emoji{animation-delay:1.6s;}
+    @keyframes wiebel-spel{0%,100%{transform:rotate(-5deg) scale(1)}50%{transform:rotate(5deg) scale(1.05)}}
+    .spel-naam{font-size:1.05rem;font-weight:900;text-shadow:0 1px 3px rgba(0,0,0,0.2);margin-bottom:4px;}
+    .spel-beschrijving{font-size:0.72rem;font-weight:700;opacity:0.85;line-height:1.4;}
+    .spel-record{margin-top:12px;font-size:0.65rem;font-weight:800;background:rgba(255,255,255,0.25);border-radius:50px;padding:4px 12px;display:inline-block;}
+    .spel-sterren{margin-top:6px;font-size:0.85rem;letter-spacing:1px;}
+
+    /* ── STATS ── */
+    .stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+    @media(max-width:400px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
+    .stat-kaart{background:white;border-radius:20px;padding:16px 10px;text-align:center;box-shadow:0 4px 0 rgba(0,0,0,0.06);}
+    .stat-icon{font-size:1.4rem;display:block;margin-bottom:5px;}
+    .stat-getal{font-size:2rem;font-weight:900;line-height:1;}
+    .stat-label{font-size:0.62rem;font-weight:800;color:#aaa;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;}
+
+    /* ── WEEKKALENDAR ── */
+    .week-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-bottom:14px;}
+    .dag-kaart{background:rgba(255,255,255,0.15);border-radius:16px;padding:10px 4px;text-align:center;border:2px solid rgba(255,255,255,0.1);}
+    .dag-kaart.gedaan{background:white;border-color:transparent;}
+    .dag-kaart.vandaag{border-color:#ffd700;border-width:3px;}
+    .dag-naam{font-size:0.62rem;font-weight:900;text-transform:uppercase;color:rgba(255,255,255,0.6);margin-bottom:6px;}
+    .dag-kaart.gedaan .dag-naam{color:#aaa;}
+    .dag-cirkel{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.1);margin:0 auto;display:flex;align-items:center;justify-content:center;font-size:1rem;}
+    .dag-kaart.gedaan .dag-cirkel{background:linear-gradient(135deg,#34d399,#38bdf8);}
+    .dag-kaart.vandaag .dag-cirkel{background:linear-gradient(135deg,#ffd700,#ff8c00);}
+
+    /* ── BADGES ── */
+    .badges-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
+    @media(max-width:400px){.badges-grid{grid-template-columns:repeat(3,1fr);}}
+    .badge{background:white;border-radius:20px;padding:14px 8px;text-align:center;box-shadow:0 4px 0 rgba(0,0,0,0.06);transition:transform 0.15s;}
+    .badge.slot{background:rgba(255,255,255,0.1);box-shadow:none;}
+    .badge:hover{transform:translateY(-2px);}
+    .badge-icon{font-size:2rem;display:block;margin-bottom:5px;}
+    .badge.slot .badge-icon{filter:grayscale(1);opacity:0.3;}
+    .badge-naam{font-size:0.65rem;font-weight:900;color:#555;text-transform:uppercase;letter-spacing:0.5px;}
+    .badge.slot .badge-naam{color:rgba(255,255,255,0.3);}
+    .badge-sub{font-size:0.6rem;font-weight:700;color:#aaa;margin-top:2px;}
+    .badge.slot .badge-sub{color:rgba(255,255,255,0.2);}
+    .badge-nieuw{display:inline-block;background:#ef4444;color:white;font-size:0.55rem;font-weight:900;border-radius:50px;padding:2px 6px;text-transform:uppercase;letter-spacing:0.5px;margin-top:4px;}
+
+    /* ── VOORTGANG PER SPEL ── */
+    .voortgang-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px;}
+    .voortgang-kaart{background:white;border-radius:20px;padding:14px 16px;box-shadow:0 4px 0 rgba(0,0,0,0.06);}
+    .vk-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+    .vk-emoji{font-size:1.5rem;}
+    .vk-naam{font-size:0.85rem;font-weight:900;color:#333;}
+    .vk-bar-wrap{background:#f0f0f0;border-radius:10px;height:8px;overflow:hidden;margin-bottom:6px;}
+    .vk-bar{height:100%;border-radius:10px;transition:width 0.8s cubic-bezier(.34,1.56,.64,1);}
+    .vk-bar.raken{background:linear-gradient(90deg,#FF6B6B,#FF8E53);}
+    .vk-bar.tafels{background:linear-gradient(90deg,#667EEA,#764BA2);}
+    .vk-bar.spelling{background:linear-gradient(90deg,#11998E,#38EF7D);}
+    .vk-bar.woorden{background:linear-gradient(90deg,#F093FB,#F5576C);}
+    .vk-stats{display:flex;justify-content:space-between;}
+    .vk-stat{font-size:0.68rem;font-weight:800;color:#888;}
+    .vk-sterren{font-size:0.9rem;letter-spacing:2px;}
+
+    /* ── UITDAGING ── */
+    .uitdaging{background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:24px;padding:20px 22px;margin-bottom:14px;display:flex;align-items:center;gap:18px;box-shadow:0 6px 0 rgba(0,0,0,0.2);}
+    .uitdaging-icon{font-size:3.5rem;flex-shrink:0;animation:wiebel 2s ease-in-out infinite;}
+    .uitdaging-body{flex:1;}
+    .uitdaging-label{font-size:0.65rem;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:#ffd700;margin-bottom:4px;}
+    .uitdaging-titel{font-size:1rem;font-weight:900;color:white;margin-bottom:4px;}
+    .uitdaging-sub{font-size:0.78rem;font-weight:700;color:rgba(255,255,255,0.6);}
+    .uitdaging-beloning{font-size:0.78rem;font-weight:900;color:#34d399;margin-top:6px;}
+
+    /* ── TIPS ── */
+    .tips-lijst{display:grid;grid-template-columns:1fr;gap:10px;}
+    @media(min-width:600px){.tips-lijst{grid-template-columns:repeat(3,1fr);}}
+    .tip{background:white;border-radius:20px;padding:16px;box-shadow:0 4px 0 rgba(0,0,0,0.06);display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;}
+    .tip-emoji{font-size:2.2rem;}
+    .tip-titel{font-size:0.9rem;font-weight:900;color:#333;margin-bottom:4px;}
+    .tip-sub{font-size:0.75rem;font-weight:700;color:#888;line-height:1.5;}
+
+    /* CONFETTI */
+    .confetti-c{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:999;}
+    .confetti-s{position:absolute;width:10px;height:10px;border-radius:3px;animation:val 1.2s ease-out forwards;}
+    @keyframes val{0%{top:-20px;opacity:1;transform:rotate(0deg)}100%{top:110vh;opacity:0;transform:rotate(720deg)}}
+  </style>
+</head>
+<body>
+
+<div class="sky"></div>
+<div class="wolk" style="width:180px;height:50px;top:8%;animation-duration:25s;animation-delay:0s;"><div style="width:70px;height:70px;background:white;border-radius:50%;position:absolute;top:-35px;left:30px;"></div><div style="width:50px;height:50px;background:white;border-radius:50%;position:absolute;top:-25px;left:80px;"></div></div>
+<div class="wolk" style="width:140px;height:40px;top:20%;animation-duration:35s;animation-delay:-10s;"><div style="width:55px;height:55px;background:white;border-radius:50%;position:absolute;top:-28px;left:20px;"></div></div>
+<div class="wolk" style="width:200px;height:55px;top:5%;animation-duration:45s;animation-delay:-20s;"><div style="width:80px;height:80px;background:white;border-radius:50%;position:absolute;top:-40px;left:40px;"></div><div style="width:60px;height:60px;background:white;border-radius:50%;position:absolute;top:-30px;left:100px;"></div></div>
+<div class="deco" style="left:5%;top:30%;font-size:2.5rem;animation-delay:0s;">🌸</div>
+<div class="deco" style="right:6%;top:25%;font-size:2rem;animation-delay:0.5s;">⭐</div>
+<div class="deco" style="left:3%;top:55%;font-size:1.8rem;animation-delay:1s;">🍄</div>
+<div class="deco" style="right:4%;top:50%;font-size:2rem;animation-delay:1.5s;">🌻</div>
+<div class="deco" style="left:8%;top:75%;font-size:2.2rem;animation-delay:0.7s;">🐛</div>
+<div class="deco" style="right:7%;top:70%;font-size:1.8rem;animation-delay:0.3s;">🦋</div>
+<div class="gras"></div>
+
+<div class="beer-loper">
+  <svg class="beer-bob" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <circle cx="55" cy="48" r="28" fill="#6B3A2A"/><circle cx="145" cy="48" r="28" fill="#6B3A2A"/>
+    <circle cx="55" cy="48" r="17" fill="#8B5340"/><circle cx="145" cy="48" r="17" fill="#8B5340"/>
+    <ellipse cx="100" cy="82" rx="62" ry="58" fill="#7A4030"/>
+    <ellipse cx="100" cy="98" rx="38" ry="30" fill="#C17A5A"/>
+    <circle cx="80" cy="75" r="11" fill="white"/><circle cx="120" cy="75" r="11" fill="white"/>
+    <circle cx="83" cy="77" r="7" fill="#1a0a00"/><circle cx="123" cy="77" r="7" fill="#1a0a00"/>
+    <circle cx="85" cy="75" r="2.5" fill="white"/><circle cx="125" cy="75" r="2.5" fill="white"/>
+    <ellipse cx="100" cy="95" rx="14" ry="9" fill="#3D1A10"/>
+    <circle cx="95" cy="93" r="3" fill="rgba(255,255,255,0.3)"/>
+    <path d="M88 106 Q100 116 112 106" stroke="#3D1A10" stroke-width="3" fill="none" stroke-linecap="round"/>
+    <ellipse cx="100" cy="162" rx="58" ry="50" fill="#6B3A2A"/>
+    <ellipse cx="100" cy="168" rx="36" ry="32" fill="#9B6048"/>
+    <ellipse cx="38" cy="150" rx="20" ry="38" fill="#6B3A2A" transform="rotate(-15 38 150)"/>
+    <ellipse cx="162" cy="150" rx="20" ry="38" fill="#6B3A2A" transform="rotate(15 162 150)"/>
+    <circle cx="26" cy="182" r="16" fill="#7A4030"/><circle cx="174" cy="182" r="16" fill="#7A4030"/>
+    <ellipse cx="72" cy="196" rx="20" ry="18" fill="#5A2E1E"/>
+    <ellipse cx="128" cy="196" rx="20" ry="18" fill="#5A2E1E"/>
+  </svg>
+</div>
+<div class="confetti-c" id="cc"></div>
+
+<div class="content">
+
+  <!-- HEADER -->
+  <div class="header">
+    <span class="regenboog">🌈</span>
+    <div class="titel">LerenLand</div>
+    <div class="sub" id="begroeting">✨ Leren is leuk! ✨</div>
+  </div>
+
+  <!-- RIJ 1: WIE BEN JIJ + DAGDOEL (symmetrisch) -->
+  <div class="rij-top">
+    <div class="top-kaart naam-kaart">
+      <div class="kaart-icon-blok">
+        <span class="kaart-groot-icon">🧒</span>
+        <span class="kaart-icon-label">Wie ben jij?</span>
+      </div>
+      <div class="kaart-body">
+        <div class="naam-waarde" id="naam-waarde">Kies jouw leeftijd 👇</div>
+        <div class="lt-grid" id="lt-grid">
+          <button class="lt-btn" onclick="kiesLeeftijd(6,this)">6</button>
+          <button class="lt-btn" onclick="kiesLeeftijd(7,this)">7</button>
+          <button class="lt-btn" onclick="kiesLeeftijd(8,this)">8</button>
+          <button class="lt-btn" onclick="kiesLeeftijd(9,this)">9</button>
+          <button class="lt-btn" onclick="kiesLeeftijd(10,this)">10</button>
+          <button class="lt-btn" onclick="kiesLeeftijd(11,this)">11</button>
+          <button class="lt-btn" onclick="kiesLeeftijd(12,this)">12</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="top-kaart doel-kaart">
+      <div class="kaart-icon-blok">
+        <span class="kaart-groot-icon">🎯</span>
+        <span class="kaart-icon-label">Dagdoel</span>
+      </div>
+      <div class="kaart-body">
+        <div class="doel-tekst" id="doel-tekst">Speel vandaag 3 spellen!</div>
+        <div class="doel-sub" id="doel-sub">Nog 3 te gaan ➡️</div>
+        <div class="doel-bar-wrap"><div class="doel-bar" id="doel-bar" style="width:0%"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STREAK BANNER -->
+  <div class="streak-banner">
+    <div class="streak-item">
+      <div class="streak-getal" id="st-gespeeld" style="color:#FF6B6B;">0</div>
+      <div class="streak-label">🎮 Gespeeld</div>
+    </div>
+    <div class="streak-item">
+      <div class="streak-getal" id="st-goed" style="color:#34d399;">0</div>
+      <div class="streak-label">✅ Goed</div>
+    </div>
+    <div class="streak-item">
+      <div class="streak-getal" id="st-streak" style="color:#ffd700;">0</div>
+      <div class="streak-label">🔥 Streak</div>
+    </div>
+    <div class="streak-item">
+      <div class="streak-getal" id="st-totaal" style="color:#a78bfa;">0</div>
+      <div class="streak-label">🏆 Totaal</div>
+    </div>
+  </div>
+
+  <!-- BEER BANNER -->
+  <div class="beer-banner">
+    <div class="beer-banner-icon">🐻</div>
+    <div class="beer-banner-midden">
+      <div class="beer-banner-label">⚠️ Pas op!</div>
+      <div class="beer-banner-titel">De beer sluipt achter je aan!</div>
+      <div class="beer-banner-sub">5 fouten = <strong style="color:#ef4444;">gepakt</strong> 🐾 &nbsp;·&nbsp; 3 goede op een rij = beer rent weg!</div>
+    </div>
+    <div class="beer-banner-icon">🐾</div>
+  </div>
+
+  <!-- DAGELIJKSE UITDAGING -->
+  <div class="sectie-label">⚡ Dagelijkse uitdaging</div>
+  <div class="uitdaging">
+    <div class="uitdaging-icon" id="uitdaging-icon">🎲</div>
+    <div class="uitdaging-body">
+      <div class="uitdaging-label">🏅 Vandaag te verdienen</div>
+      <div class="uitdaging-titel" id="uitdaging-titel">Laden...</div>
+      <div class="uitdaging-sub" id="uitdaging-sub"></div>
+      <div class="uitdaging-beloning" id="uitdaging-beloning"></div>
+    </div>
+  </div>
+
+  <!-- SPELLEN -->
+  <div class="sectie-label">🎮 Kies een spel</div>
+  <div class="spellen-grid">
+    <a href="/reken" class="spel-kaart raken" onclick="telSpel('raken')">
+      <div class="spel-bubble"></div><div class="spel-bubble2"></div>
+      <span class="spel-emoji">🚀</span>
+      <div class="spel-naam">RekenRaket</div>
+      <div class="spel-beschrijving">Sommen maken en punten scoren!</div>
+      <div class="spel-sterren" id="str-raken">☆☆☆☆☆</div>
+      <div class="spel-record" id="rec-raken">▶ Nog niet gespeeld</div>
+    </a>
+    <a href="/tafels" class="spel-kaart tafels" onclick="telSpel('tafels')">
+      <div class="spel-bubble"></div><div class="spel-bubble2"></div>
+      <span class="spel-emoji">🐯</span>
+      <div class="spel-naam">TafelTijger</div>
+      <div class="spel-beschrijving">Tafels uit je hoofd — zo snel!</div>
+      <div class="spel-sterren" id="str-tafels">☆☆☆☆☆</div>
+      <div class="spel-record" id="rec-tafels">▶ Nog niet gespeeld</div>
+    </a>
+    <a href="/spelling" class="spel-kaart spelling" onclick="telSpel('spelling')">
+      <div class="spel-bubble"></div><div class="spel-bubble2"></div>
+      <span class="spel-emoji">🐝</span>
+      <div class="spel-naam">SpellingBij</div>
+      <div class="spel-beschrijving">Woorden goed leren schrijven!</div>
+      <div class="spel-sterren" id="str-spelling">☆☆☆☆☆</div>
+      <div class="spel-record" id="rec-spelling">▶ Nog niet gespeeld</div>
+    </a>
+    <a href="/woorden" class="spel-kaart woorden" onclick="telSpel('woorden')">
+      <div class="spel-bubble"></div><div class="spel-bubble2"></div>
+      <span class="spel-emoji">🧠</span>
+      <div class="spel-naam">Woordenschat</div>
+      <div class="spel-beschrijving">Wat betekent dit woord? Raad het!</div>
+      <div class="spel-sterren" id="str-woorden">☆☆☆☆☆</div>
+      <div class="spel-record" id="rec-woorden">▶ Nog niet gespeeld</div>
+    </a>
+    <a href="/avontuur" class="spel-kaart avontuur" onclick="telSpel('avontuur')">
+      <div class="spel-bubble"></div><div class="spel-bubble2"></div>
+      <span class="spel-emoji">🗺️</span>
+      <div class="spel-naam">Groot Avontuur</div>
+      <div class="spel-beschrijving">Kies een thema, kies 10 levels, verdien badges en word een grootmeester!</div>
+      <div class="spel-sterren" id="str-avontuur">☆☆☆☆☆</div>
+      <div class="spel-record" id="rec-avontuur">▶ Nog niet gespeeld</div>
+    </a>
+  </div>
+
+  <!-- VOORTGANG PER SPEL -->
+  <div class="sectie-label">📈 Jouw voortgang</div>
+  <div class="voortgang-grid">
+    <div class="voortgang-kaart">
+      <div class="vk-header"><span class="vk-emoji">🚀</span><span class="vk-naam">RekenRaket</span></div>
+      <div class="vk-bar-wrap"><div class="vk-bar raken" id="vb-raken" style="width:0%"></div></div>
+      <div class="vk-stats"><span class="vk-stat" id="vs-raken">0 gespeeld</span><span class="vk-sterren" id="vstr-raken">☆☆☆</span></div>
+    </div>
+    <div class="voortgang-kaart">
+      <div class="vk-header"><span class="vk-emoji">🐯</span><span class="vk-naam">TafelTijger</span></div>
+      <div class="vk-bar-wrap"><div class="vk-bar tafels" id="vb-tafels" style="width:0%"></div></div>
+      <div class="vk-stats"><span class="vk-stat" id="vs-tafels">0 gespeeld</span><span class="vk-sterren" id="vstr-tafels">☆☆☆</span></div>
+    </div>
+    <div class="voortgang-kaart">
+      <div class="vk-header"><span class="vk-emoji">🐝</span><span class="vk-naam">SpellingBij</span></div>
+      <div class="vk-bar-wrap"><div class="vk-bar spelling" id="vb-spelling" style="width:0%"></div></div>
+      <div class="vk-stats"><span class="vk-stat" id="vs-spelling">0 gespeeld</span><span class="vk-sterren" id="vstr-spelling">☆☆☆</span></div>
+    </div>
+    <div class="voortgang-kaart">
+      <div class="vk-header"><span class="vk-emoji">🧠</span><span class="vk-naam">Woordenschat</span></div>
+      <div class="vk-bar-wrap"><div class="vk-bar woorden" id="vb-woorden" style="width:0%"></div></div>
+      <div class="vk-stats"><span class="vk-stat" id="vs-woorden">0 gespeeld</span><span class="vk-sterren" id="vstr-woorden">☆☆☆</span></div>
+    </div>
+  </div>
+
+  <!-- BADGES -->
+  <div class="sectie-label">🏅 Jouw badges</div>
+  <div class="badges-grid" id="badges-grid">
+    <!-- Gevuld door JS -->
+  </div>
+
+  <!-- WEEK OVERZICHT -->
+  <div class="sectie-label">📅 Deze week geoefend</div>
+  <div class="week-grid" id="week-grid">
+    <!-- Gevuld door JS -->
+  </div>
+
+  <!-- TIPS -->
+  <div class="sectie-label">💡 Handige tips</div>
+  <div class="tips-lijst">
+    <div class="tip">
+      <div class="tip-emoji">⏰</div>
+      <div>
+        <div class="tip-titel">Oefen elke dag!</div>
+        <div class="tip-sub">10 minuten per dag is genoeg. Je hersenen worden er veel beter van!</div>
+      </div>
+    </div>
+    <div class="tip">
+      <div class="tip-emoji">🌟</div>
+      <div>
+        <div class="tip-titel">Fouten zijn oké!</div>
+        <div class="tip-sub">Van fouten leer je het meest. Probeer gewoon opnieuw!</div>
+      </div>
+    </div>
+    <div class="tip">
+      <div class="tip-emoji">🎉</div>
+      <div>
+        <div class="tip-titel">Vier je punten!</div>
+        <div class="tip-sub">Elke reeks van 5 op een rij is super knap. Houd het vol!</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const stats = JSON.parse(localStorage.getItem('ll_stats2')||'{}');
+const vandaag = new Date().toDateString();
+if(stats.datum!==vandaag){
+  stats.datum=vandaag;stats.gespeeldVandaag=0;stats.goedVandaag=0;stats.doelVandaag=0;
+  localStorage.setItem('ll_stats2',JSON.stringify(stats));
+}
+function slaOp(){localStorage.setItem('ll_stats2',JSON.stringify(stats));}
+
+// ── BADGES DEFINITIE ──
+const ALLE_BADGES = [
+  {id:'eerste',icon:'🌱',naam:'Eerste stap',sub:'1× gespeeld',check:()=>(stats.gespeeldTotaal||0)>=1},
+  {id:'speler5',icon:'🎮',naam:'Gamer',sub:'5× gespeeld',check:()=>(stats.gespeeldTotaal||0)>=5},
+  {id:'speler20',icon:'🕹️',naam:'Pro Speler',sub:'20× gespeeld',check:()=>(stats.gespeeldTotaal||0)>=20},
+  {id:'streak3',icon:'🔥',naam:'Op Dreef!',sub:'Streak van 3',check:()=>(stats.besteStreak||0)>=3},
+  {id:'streak10',icon:'💥',naam:'Vuurbal',sub:'Streak van 10',check:()=>(stats.besteStreak||0)>=10},
+  {id:'allespellen',icon:'🌈',naam:'Alles-speler',sub:'4 spellen geprobeerd',check:()=>['raken','tafels','spelling','woorden'].every(g=>(stats['game_'+g]||{}).gespeeld>=1)},
+  {id:'goed50',icon:'⭐',naam:'Ster',sub:'50 goede antwoorden',check:()=>(stats.goedTotaal||0)>=50},
+  {id:'goed100',icon:'🏆',naam:'Kampioen',sub:'100 goede antwoorden',check:()=>(stats.goedTotaal||0)>=100},
+];
+
+// ── UITDAGINGEN ──
+const UITDAGINGEN = [
+  {icon:'🚀',titel:'Speel RekenRaket 1x',sub:'Open RekenRaket en voltooi een ronde',beloning:'🏅 Badge: Eerste stap'},
+  {icon:'🔥',titel:'Haal een streak van 5!',sub:'5 goede antwoorden op een rij in één spel',beloning:'🌟 Extra punten en vuurbal-badge'},
+  {icon:'🌈',titel:'Speel alle 4 de spellen!',sub:'Open elk spel minstens één keer',beloning:'🏅 Badge: Alles-speler'},
+  {icon:'🐯',titel:'Oefen de tafels van 6',sub:'Open TafelTijger en kies tafel 6',beloning:'💡 Slim en snel rekenen'},
+  {icon:'🐝',titel:'Spel 3 woorden correct!',sub:'Open SpellingBij en schrijf 3 woorden goed',beloning:'📚 Je spelling wordt beter!'},
+];
+
+function kiesLeeftijd(l,btn){
+  stats.leeftijd=l;slaOp();
+  document.querySelectorAll('.lt-btn').forEach(b=>b.classList.remove('actief'));
+  btn.classList.add('actief');
+  const namen={6:'6 jaar',7:'7 jaar',8:'8 jaar',9:'9 jaar',10:'10 jaar',11:'11 jaar',12:'12 jaar'};
+  document.getElementById('naam-waarde').textContent='Jij bent '+namen[l]+' 🎉';
+  confetti();
+}
+
+function telSpel(spel){
+  stats.gespeeldVandaag=(stats.gespeeldVandaag||0)+1;
+  stats.doelVandaag=(stats.doelVandaag||0)+1;
+  stats.gespeeldTotaal=(stats.gespeeldTotaal||0)+1;
+  if(spel){
+    if(!stats['game_'+spel])stats['game_'+spel]={};
+    stats['game_'+spel].gespeeld=(stats['game_'+spel].gespeeld||0)+1;
+  }
+  slaOp();
+}
+
+function sterren(cnt){
+  const s=Math.min(5,Math.ceil(cnt/3));
+  return '⭐'.repeat(s)+'☆'.repeat(5-s);
+}
+function sterrenDrie(cnt){
+  const s=Math.min(3,Math.ceil(cnt/5));
+  return '⭐'.repeat(s)+'☆'.repeat(3-s);
+}
+
+function sterrenTxt(n){return '⭐'.repeat(n)+'☆'.repeat(3-n);}
+
+function laadStats(){
+  document.getElementById('st-gespeeld').textContent=stats.gespeeldVandaag||0;
+  document.getElementById('st-goed').textContent=stats.goedVandaag||0;
+  document.getElementById('st-streak').textContent=stats.besteStreak||0;
+  document.getElementById('st-totaal').textContent=stats.goedTotaal||0;
+
+  // Dagdoel
+  const doel=Math.min(stats.doelVandaag||0,3);
+  const nog=3-doel;
+  document.getElementById('doel-bar').style.width=(doel/3*100)+'%';
+  document.getElementById('doel-tekst').textContent=nog===0?'🎉 Dagdoel behaald! Super!':'Speel vandaag 3 spellen!';
+  document.getElementById('doel-sub').textContent=nog===0?'Je hebt vandaag 3 spellen gespeeld!':`Nog ${nog} spel${nog===1?'':'len'} te gaan ➡️`;
+
+  // Leeftijd herstellen
+  if(stats.leeftijd){
+    document.querySelectorAll('.lt-btn').forEach(b=>{
+      if(parseInt(b.textContent)===stats.leeftijd)b.classList.add('actief');
+    });
+    const namen={6:'6 jaar',7:'7 jaar',8:'8 jaar',9:'9 jaar',10:'10 jaar',11:'11 jaar',12:'12 jaar'};
+    document.getElementById('naam-waarde').textContent='Jij bent '+namen[stats.leeftijd]+' 🎉';
+  }
+
+  // Week overzicht
+  const weekEl=document.getElementById('week-grid');
+  weekEl.innerHTML='';
+  const dagen=['Ma','Di','Wo','Do','Vr','Za','Zo'];
+  const gespeeldeWeek=stats.gespeeldeWeek||{};
+  const now=new Date();
+  const dagNr=(now.getDay()+6)%7;
+  for(let i=0;i<7;i++){
+    const d=new Date(now);d.setDate(now.getDate()-(dagNr-i));
+    const key=d.toDateString();
+    const gedaan=!!(gespeeldeWeek[key]);
+    const isVandaag=(key===vandaag);
+    const div=document.createElement('div');
+    div.className='dag-kaart'+(gedaan?' gedaan':'')+(isVandaag?' vandaag':'');
+    div.innerHTML=`<div class="dag-naam">${dagen[i]}</div><div class="dag-cirkel">${gedaan?'✓':isVandaag?'→':''}</div>`;
+    weekEl.appendChild(div);
+  }
+
+  // Uitdaging van de dag
+  const dagIndex=new Date().getDate()%UITDAGINGEN.length;
+  const ud=UITDAGINGEN[dagIndex];
+  document.getElementById('uitdaging-icon').textContent=ud.icon;
+  document.getElementById('uitdaging-titel').textContent=ud.titel;
+  document.getElementById('uitdaging-sub').textContent=ud.sub;
+  document.getElementById('uitdaging-beloning').textContent=ud.beloning;
+
+  // Begroeting
+  const begroetingen=['✨ Leren is leuk! ✨','🌟 Doe je best vandaag!','🎉 Klaar voor een uitdaging?','🚀 Laten we leren!','🐝 Slim en snel!'];
+  document.getElementById('begroeting').textContent=begroetingen[new Date().getDate()%begroetingen.length];
+
+  // Markeer vandaag als geoefend
+  if((stats.gespeeldVandaag||0)>0){
+    if(!gespeeldeWeek[vandaag])gespeeldeWeek[vandaag]=true;
+    stats.gespeeldeWeek=gespeeldeWeek;slaOp();
+  }
+
+  // Voortgang + badges via backend
+  const lt=stats.leeftijd||0;
+  fetch('/api/voortgang'+(lt?'?leeftijd='+lt:'')).then(r=>r.json()).then(vg=>{
+    ['raken','tafels','spelling','woorden'].forEach(g=>{
+      const d=vg[g]||{sessies:0,beste:0,sterren:0};
+      document.getElementById('rec-'+g).textContent=d.sessies>0?`▶ ${d.sessies}× gespeeld`:'▶ Nog niet gespeeld';
+      document.getElementById('str-'+g).textContent=sterrenTxt(d.sterren)+'☆'.repeat(Math.max(0,5-d.sterren));
+      document.getElementById('str-'+g).textContent='⭐'.repeat(d.sterren)+'☆'.repeat(Math.max(0,5-d.sterren));
+      document.getElementById('vb-'+g).style.width=Math.min(100,d.sessies*10)+'%';
+      document.getElementById('vs-'+g).textContent=d.sessies+' gespeeld · beste: '+d.beste;
+      document.getElementById('vstr-'+g).textContent=sterrenTxt(Math.min(3,d.sterren));
+    });
+    // Badges op basis van backend data
+    const totaalSessies=Object.values(vg).reduce((s,d)=>s+(d.sessies||0),0);
+    const alleSpellenGespeeld=['raken','tafels','spelling','woorden'].every(g=>(vg[g]||{}).sessies>=1);
+    const grid=document.getElementById('badges-grid');
+    grid.innerHTML='';
+    const badgeDefs=[
+      {id:'eerste',icon:'🌱',naam:'Eerste stap',sub:'1× gespeeld',ok:totaalSessies>=1},
+      {id:'speler5',icon:'🎮',naam:'Gamer',sub:'5× gespeeld',ok:totaalSessies>=5},
+      {id:'speler20',icon:'🕹️',naam:'Pro Speler',sub:'20× gespeeld',ok:totaalSessies>=20},
+      {id:'streak3',icon:'🔥',naam:'Op Dreef!',sub:'Streak van 3',ok:(stats.besteStreak||0)>=3},
+      {id:'streak10',icon:'💥',naam:'Vuurbal',sub:'Streak van 10',ok:(stats.besteStreak||0)>=10},
+      {id:'allespellen',icon:'🌈',naam:'Alles-speler',sub:'4 spellen geprobeerd',ok:alleSpellenGespeeld},
+      {id:'goed50',icon:'⭐',naam:'Ster',sub:'50 goede antwoorden',ok:(stats.goedTotaal||0)>=50},
+      {id:'goed100',icon:'🏆',naam:'Kampioen',sub:'100 goede antwoorden',ok:(stats.goedTotaal||0)>=100},
+    ];
+    badgeDefs.forEach(b=>{
+      const div=document.createElement('div');
+      div.className='badge'+(b.ok?'':' slot');
+      div.innerHTML=`<span class="badge-icon">${b.icon}</span><div class="badge-naam">${b.naam}</div><div class="badge-sub">${b.sub}</div>${b.ok?'<span class="badge-nieuw">✓</span>':''}`;
+      grid.appendChild(div);
+    });
+  }).catch(()=>{
+    // Fallback: localStorage
+    ['raken','tafels','spelling','woorden'].forEach(g=>{
+      const cnt=(stats['game_'+g]||{}).gespeeld||0;
+      document.getElementById('rec-'+g).textContent=cnt>0?`▶ ${cnt}× gespeeld`:'▶ Nog niet gespeeld';
+      document.getElementById('str-'+g).textContent='⭐'.repeat(Math.min(5,Math.ceil(cnt/3)))+'☆'.repeat(Math.max(0,5-Math.min(5,Math.ceil(cnt/3))));
+      document.getElementById('vb-'+g).style.width=Math.min(100,cnt*10)+'%';
+      document.getElementById('vs-'+g).textContent=cnt+' gespeeld';
+      document.getElementById('vstr-'+g).textContent='⭐'.repeat(Math.min(3,Math.ceil(cnt/5)))+'☆'.repeat(Math.max(0,3-Math.min(3,Math.ceil(cnt/5))));
+    });
+  });
+}
+
+function confetti(){
+  const c=document.getElementById('cc');
+  const kl=['#FF6B6B','#FFD700','#11998E','#667EEA','#F093FB','#FF8C00','#38EF7D'];
+  for(let i=0;i<30;i++){
+    const s=document.createElement('div');s.className='confetti-s';
+    s.style.left=Math.random()*100+'vw';
+    s.style.background=kl[Math.floor(Math.random()*kl.length)];
+    s.style.animationDuration=(0.8+Math.random()*0.8)+'s';
+    s.style.animationDelay=Math.random()*0.4+'s';
+    s.style.borderRadius=Math.random()>0.5?'50%':'3px';
+    c.appendChild(s);setTimeout(()=>s.remove(),1800);
+  }
+}
+
+laadStats();
+</script>
+</body>
+</html>

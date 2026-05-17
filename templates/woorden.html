@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>Woordenschat 🧠</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Nunito',system-ui,sans-serif;background:linear-gradient(135deg,#1a0533,#3b0764,#1e1b4b);min-height:100vh;color:white;display:flex;flex-direction:column;align-items:center;padding:20px;}
+    .terug{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.5);text-decoration:none;font-size:0.85rem;margin-bottom:16px;align-self:flex-start;}
+    .terug:hover{color:white;}
+    .header{text-align:center;margin-bottom:20px;}
+    .logo{font-size:2rem;}
+    .titel{font-size:1.5rem;font-weight:900;background:linear-gradient(135deg,#f43f5e,#a78bfa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .card{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:24px;padding:24px;width:100%;max-width:500px;backdrop-filter:blur(10px);}
+    .vraag{font-size:0.95rem;font-weight:700;margin-bottom:12px;}
+    .leeftijd-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:20px;}
+    .leeftijd-btn{background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.15);border-radius:12px;padding:12px 6px;color:white;font-size:1rem;font-weight:700;cursor:pointer;transition:all 0.2s;text-align:center;}
+    .leeftijd-btn.actief{background:linear-gradient(135deg,#f43f5e,#a78bfa);border-color:transparent;color:white;transform:scale(1.05);}
+    .start-btn{width:100%;background:linear-gradient(135deg,#f43f5e,#a78bfa);border:none;border-radius:16px;padding:16px;color:white;font-size:1rem;font-weight:900;cursor:pointer;box-shadow:0 4px 20px rgba(244,63,94,0.3);}
+    .start-btn:active{transform:scale(0.97);}
+
+    #spel{width:100%;max-width:500px;display:none;}
+    .score-bar{display:flex;gap:10px;margin-bottom:14px;}
+    .score-blok{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:10px;text-align:center;flex:1;}
+    .score-getal{font-size:1.3rem;font-weight:900;color:#a78bfa;}
+    .score-label{font-size:0.65rem;color:rgba(255,255,255,0.5);}
+    .woord-kaart{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:24px;padding:32px 20px;text-align:center;margin-bottom:14px;min-height:130px;display:flex;flex-direction:column;justify-content:center;align-items:center;}
+    .woord-label{font-size:0.75rem;color:rgba(255,255,255,0.5);margin-bottom:10px;text-transform:uppercase;letter-spacing:1px;}
+    .woord-groot{font-size:2.2rem;font-weight:900;letter-spacing:2px;}
+    .opties-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+    .optie-btn{background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.15);border-radius:16px;padding:14px 10px;color:white;font-size:0.9rem;font-weight:600;cursor:pointer;transition:all 0.2s;line-height:1.3;min-height:60px;display:flex;align-items:center;justify-content:center;text-align:center;}
+    .optie-btn:active{transform:scale(0.96);}
+    .optie-btn.goed{background:rgba(16,185,129,0.2);border-color:#10b981;color:#34d399;}
+    .optie-btn.fout{background:rgba(239,68,68,0.1);border-color:#ef4444;color:#fca5a5;}
+    .optie-btn.toon-goed{background:rgba(16,185,129,0.15);border-color:rgba(16,185,129,0.5);color:#6ee7b7;}
+    .optie-btn:disabled{cursor:default;}
+    .feedback{background:rgba(255,255,255,0.06);border-radius:14px;padding:12px;text-align:center;font-size:0.9rem;font-weight:600;min-height:46px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;}
+    .feedback.goed{background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);}
+    .feedback.fout{background:rgba(239,68,68,0.1);color:#fca5a5;border:1px solid rgba(239,68,68,0.2);}
+    .volgende-btn{width:100%;background:linear-gradient(135deg,#f43f5e,#a78bfa);border:none;border-radius:14px;padding:14px;color:white;font-size:0.95rem;font-weight:700;cursor:pointer;display:none;margin-bottom:10px;}
+    .stop-btn{background:transparent;border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:10px;color:rgba(255,255,255,0.4);font-size:0.8rem;cursor:pointer;width:100%;}
+    .laden{font-size:1rem;color:rgba(255,255,255,0.4);text-align:center;padding:20px;}
+    @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+    @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+    .bounce{animation:bounce 0.35s ease;}
+    .shake{animation:shake 0.3s ease;}
+    .confetti-c{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:99;}
+    .confetti-s{position:absolute;width:9px;height:9px;border-radius:2px;animation:val 1s ease-out forwards;}
+    @keyframes val{0%{top:-20px;opacity:1}100%{top:110vh;opacity:0}}
+
+    /* ── BEER ACHTERGROND ── */
+    .beer-bg{position:fixed;bottom:-40px;right:-300px;font-size:10rem;pointer-events:none;z-index:0;transition:right 0.9s cubic-bezier(.34,1.56,.64,1),font-size 0.9s cubic-bezier(.34,1.56,.64,1),opacity 0.6s;opacity:0;animation:beerRennen 1s ease-in-out infinite;user-select:none;filter:drop-shadow(0 0 30px rgba(239,68,68,0));}
+    @keyframes beerRennen{0%,100%{transform:translateY(0) rotate(-4deg) scaleX(-1)}50%{transform:translateY(-22px) rotate(4deg) scaleX(-1)}}
+    .beer-bg.l1{right:20px;font-size:9rem;opacity:0.09;animation-duration:1s;}
+    .beer-bg.l2{right:10px;font-size:15rem;opacity:0.14;animation-duration:0.65s;filter:drop-shadow(0 0 20px rgba(239,68,68,0.1));}
+    .beer-bg.l3{right:-20px;font-size:22rem;opacity:0.2;animation-duration:0.4s;filter:drop-shadow(0 0 40px rgba(239,68,68,0.2));}
+    .beer-bg.l4{right:-40px;font-size:32rem;opacity:0.3;animation-duration:0.2s;filter:drop-shadow(0 0 60px rgba(239,68,68,0.35));}
+
+    /* ── BEER METER ── */
+    .beer-meter{background:rgba(255,255,255,0.07);border:2px solid rgba(255,255,255,0.12);border-radius:20px;padding:12px 16px;margin-bottom:12px;display:flex;align-items:center;gap:10px;transition:all 0.3s;}
+    .beer-meter.gevaar-1{border-color:rgba(251,191,36,0.4);background:rgba(251,191,36,0.06);}
+    .beer-meter.gevaar-2{border-color:rgba(249,115,22,0.5);background:rgba(249,115,22,0.08);}
+    .beer-meter.gevaar-3{border-color:rgba(239,68,68,0.6);background:rgba(239,68,68,0.1);}
+    .beer-meter.gevaar-4{border-color:rgba(239,68,68,0.9);background:rgba(239,68,68,0.15);animation:beerShake 0.4s infinite;}
+    @keyframes beerShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+    .beer-speler{font-size:1.6rem;transition:all 0.3s;}
+    .beer-poten{display:flex;gap:3px;flex:1;justify-content:center;}
+    .beer-poot{font-size:1.1rem;opacity:0.15;transition:all 0.3s;}
+    .beer-poot.actief{opacity:1;transform:scale(1.2);filter:drop-shadow(0 0 4px #ef4444);}
+    .beer-char{font-size:1.8rem;transition:all 0.4s;}
+    .beer-char.boos{animation:beerBoos 0.5s ease-in-out infinite;}
+    @keyframes beerBoos{0%,100%{transform:scale(1) rotate(-5deg)}50%{transform:scale(1.15) rotate(5deg)}}
+    .beer-bubble{font-size:0.7rem;font-weight:800;background:white;color:#333;border-radius:10px;padding:3px 8px;position:relative;white-space:nowrap;}
+    .beer-bubble::after{content:'';position:absolute;left:-5px;top:50%;transform:translateY(-50%);border:5px solid transparent;border-right-color:white;}
+    .gepakt-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1000;display:none;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center;}
+    .gepakt-overlay.zichtbaar{display:flex;}
+    .gepakt-beer{font-size:7rem;animation:beerKom 0.6s cubic-bezier(.34,1.56,.64,1);}
+    @keyframes beerKom{0%{transform:scale(0) rotate(-20deg)}100%{transform:scale(1) rotate(0deg)}}
+    .gepakt-titel{font-size:2.2rem;font-weight:900;color:#ef4444;margin:16px 0 8px;}
+    .gepakt-sub{font-size:1rem;font-weight:700;color:rgba(255,255,255,0.7);margin-bottom:8px;}
+    .gepakt-score{font-size:1.3rem;font-weight:900;color:#ffd700;margin-bottom:24px;}
+    .gepakt-tip{background:rgba(255,255,255,0.08);border-radius:16px;padding:12px 18px;font-size:0.85rem;font-weight:700;color:rgba(255,255,255,0.6);margin-bottom:24px;max-width:320px;}
+    .gepakt-btn{background:linear-gradient(135deg,#f43f5e,#a78bfa);border:none;border-radius:16px;padding:16px 32px;color:white;font-size:1rem;font-weight:900;cursor:pointer;margin-bottom:12px;width:100%;max-width:280px;font-family:'Nunito',sans-serif;}
+    .gepakt-btn2{background:transparent;border:2px solid rgba(255,255,255,0.2);border-radius:16px;padding:12px 32px;color:rgba(255,255,255,0.5);font-size:0.85rem;font-weight:700;cursor:pointer;width:100%;max-width:280px;font-family:'Nunito',sans-serif;}
+  </style>
+</head>
+<body>
+<a href="/" class="terug">← Terug naar LerenLand</a>
+<div class="header">
+  <div class="logo">🧠</div>
+  <div class="titel">Woordenschat</div>
+</div>
+
+<div class="card" id="setup">
+  <div class="vraag">Hoe oud ben je?</div>
+  <div class="leeftijd-grid">
+    <button class="leeftijd-btn" onclick="kiesL(6,this)">6</button>
+    <button class="leeftijd-btn" onclick="kiesL(7,this)">7</button>
+    <button class="leeftijd-btn" onclick="kiesL(8,this)">8</button>
+    <button class="leeftijd-btn" onclick="kiesL(9,this)">9</button>
+    <button class="leeftijd-btn" onclick="kiesL(10,this)">10</button>
+    <button class="leeftijd-btn" onclick="kiesL(11,this)">11</button>
+    <button class="leeftijd-btn" onclick="kiesL(12,this)">12</button>
+  </div>
+  <button class="start-btn" onclick="start()">🧠 Start!</button>
+</div>
+
+<div class="gepakt-overlay" id="gepakt-overlay">
+  <div class="gepakt-beer">🐻</div>
+  <div class="gepakt-titel">GEPAKT! 🐾</div>
+  <div class="gepakt-sub">De beer heeft je te pakken!</div>
+  <div class="gepakt-score" id="gepakt-score"></div>
+  <div class="gepakt-tip">💡 Tip: 3 goede antwoorden op een rij = beer loopt weg!</div>
+  <button class="gepakt-btn" onclick="herstart()">🧠 Opnieuw proberen!</button>
+  <button class="gepakt-btn2" onclick="window.location='/'">← Terug naar LerenLand</button>
+</div>
+
+<div id="spel">
+  <!-- BEER METER -->
+  <div class="beer-meter" id="beer-meter">
+    <div class="beer-speler" id="beer-speler">🏃</div>
+    <div class="beer-poten">
+      <span class="beer-poot" id="bp0">🐾</span>
+      <span class="beer-poot" id="bp1">🐾</span>
+      <span class="beer-poot" id="bp2">🐾</span>
+      <span class="beer-poot" id="bp3">🐾</span>
+      <span class="beer-poot" id="bp4">🐾</span>
+    </div>
+    <div class="beer-bubble" id="beer-bubble">Zzz...</div>
+    <div class="beer-char" id="beer-char">🐻</div>
+  </div>
+  <div class="score-bar">
+    <div class="score-blok"><div class="score-getal" id="sg">0</div><div class="score-label">✅ Goed</div></div>
+    <div class="score-blok"><div class="score-getal" id="sf" style="color:#ef4444">0</div><div class="score-label">❌ Fout</div></div>
+    <div class="score-blok"><div class="score-getal" id="ss" style="color:#ffd700">0</div><div class="score-label">🔥 Reeks</div></div>
+  </div>
+  <div class="woord-kaart" id="wk">
+    <div class="woord-label">Wat betekent dit woord?</div>
+    <div class="woord-groot" id="wt">Laden...</div>
+  </div>
+  <div id="opties" class="opties-grid"></div>
+  <div class="feedback" id="fb"></div>
+  <button class="volgende-btn" id="vb" onclick="laad()">Volgend woord →</button>
+  <button class="stop-btn" onclick="document.getElementById('setup').style.display='block';document.getElementById('spel').style.display='none'">← Andere keuze</button>
+</div>
+<div class="beer-bg" id="beer-bg">🐻</div>
+<div id="cc" class="confetti-c"></div>
+
+<script>
+let leeftijd=null,goed=0,fout=0,streak=0,hVraag=null,beantwoord=false;
+let beerDreiging=0,beerStreak=0;
+const BEER_TEKST=['Zzz...','Hmm...?','Ik ruik je!','Bijna...! 💨','RAAAARRR!! 🐻'];
+
+function updateBeer(delta){
+  if(delta<0){beerDreiging=Math.min(5,beerDreiging+1);beerStreak=0;if(beerDreiging>=5){beerGepakt();return;}}
+  else{beerStreak++;if(beerStreak>=3){beerDreiging=Math.max(0,beerDreiging-1);beerStreak=0;}}
+  updateBeerUI();
+}
+function updateBeerUI(){
+  document.getElementById('beer-meter').className='beer-meter'+(beerDreiging>0?' gevaar-'+Math.min(beerDreiging,4):'');
+  document.getElementById('beer-bubble').textContent=BEER_TEKST[Math.min(beerDreiging,4)];
+  document.getElementById('beer-char').className='beer-char'+(beerDreiging>=3?' boos':'');
+  document.getElementById('beer-speler').textContent=beerDreiging>=3?'🏃💨':'🏃';
+  document.getElementById('beer-bg').className='beer-bg'+(beerDreiging>0?' l'+Math.min(beerDreiging,4):'');
+  for(let i=0;i<5;i++)document.getElementById('bp'+i).className='beer-poot'+(i<beerDreiging?' actief':'');
+}
+function beerGepakt(){
+  document.getElementById('gepakt-score').textContent=`Je had ${goed} goede antwoorden! ${goed>=5?'🌟':'💪'}`;
+  document.getElementById('gepakt-overlay').classList.add('zichtbaar');
+  if(leeftijd&&goed>0)fetch('/api/sessie-opslaan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({leeftijd,spel:'woorden',goed})});
+}
+function herstart(){
+  document.getElementById('gepakt-overlay').classList.remove('zichtbaar');
+  goed=0;fout=0;streak=0;beerDreiging=0;beerStreak=0;updateBeerUI();
+  document.getElementById('sg').textContent=0;document.getElementById('sf').textContent=0;document.getElementById('ss').textContent=0;
+  laad();
+}
+
+function kiesL(l,b){leeftijd=l;document.querySelectorAll('.leeftijd-btn').forEach(x=>x.classList.remove('actief'));b.classList.add('actief');}
+
+function start(){
+  if(!leeftijd){alert('Kies je leeftijd!');return;}
+  goed=0;fout=0;streak=0;
+  document.getElementById('setup').style.display='none';
+  document.getElementById('spel').style.display='block';
+  laad();
+}
+
+async function laad(){
+  beantwoord=false;hVraag=null;
+  document.getElementById('fb').className='feedback';document.getElementById('fb').textContent='';
+  document.getElementById('vb').style.display='none';
+  document.getElementById('wt').textContent='Laden...';
+  document.getElementById('opties').innerHTML='<div class="laden">Vraag ophalen... ⏳</div>';
+
+  try {
+    const r=await fetch('/api/woord-vraag',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({leeftijd})});
+    const d=await r.json();
+    if(!d.succes){document.getElementById('wt').textContent='Fout';document.getElementById('opties').innerHTML='<div class="laden">Kon geen vraag laden. Probeer opnieuw.</div>';document.getElementById('vb').style.display='block';return;}
+    hVraag=d;
+    document.getElementById('wt').textContent=d.woord;
+    const grid=document.getElementById('opties');
+    grid.innerHTML='';
+    d.opties.forEach(opt=>{
+      const btn=document.createElement('button');
+      btn.className='optie-btn';
+      btn.textContent=opt;
+      btn.onclick=()=>kies(opt,btn,d.correct,d.opties);
+      grid.appendChild(btn);
+    });
+  } catch(e) {
+    document.getElementById('wt').textContent='Fout';
+    document.getElementById('opties').innerHTML='<div class="laden">Verbindingsfout. Probeer opnieuw.</div>';
+    document.getElementById('vb').style.display='block';
+  }
+}
+
+function kies(keuze,btn,correct,alleOpties){
+  if(beantwoord)return;
+  beantwoord=true;
+  const fb=document.getElementById('fb');
+  const isGoed=keuze===correct;
+
+  // Disable all buttons and show correct answer
+  document.querySelectorAll('.optie-btn').forEach(b=>{
+    b.disabled=true;
+    if(b.textContent===correct && !isGoed) b.classList.add('toon-goed');
+  });
+
+  if(isGoed){
+    goed++;streak++;updateBeer(1);
+    btn.classList.add('goed');
+    fb.className='feedback goed';
+    fb.textContent=streak>=3?`🔥 ${streak} op een rij! Geweldig!`:'✅ Correct! Goed gedaan!';
+    document.getElementById('wk').classList.add('bounce');
+    setTimeout(()=>document.getElementById('wk').classList.remove('bounce'),400);
+    if(streak%5===0)confetti();
+  } else {
+    fout++;streak=0;updateBeer(-1);
+    btn.classList.add('fout');
+    fb.className='feedback fout';
+    fb.textContent=`❌ "${correct}" was het juiste antwoord!`;
+    document.getElementById('wk').classList.add('shake');
+    setTimeout(()=>document.getElementById('wk').classList.remove('shake'),300);
+  }
+
+  document.getElementById('sg').textContent=goed;
+  document.getElementById('sf').textContent=fout;
+  document.getElementById('ss').textContent=streak;
+  document.getElementById('vb').style.display='block';
+}
+
+function confetti(){
+  const c=document.getElementById('cc');const kl=['#f43f5e','#a78bfa','#ffd700','#34d399','#38bdf8'];
+  for(let i=0;i<25;i++){const s=document.createElement('div');s.className='confetti-s';s.style.left=Math.random()*100+'vw';s.style.background=kl[Math.floor(Math.random()*kl.length)];s.style.animationDuration=(0.7+Math.random()*0.8)+'s';s.style.animationDelay=Math.random()*0.3+'s';c.appendChild(s);setTimeout(()=>s.remove(),1500);}
+}
+</script>
+</body>
+</html>

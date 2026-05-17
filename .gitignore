@@ -1,0 +1,20 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+
+# Local data (NEVER COMMIT - contains kid progress data)
+*.db
+*.sqlite
+lerenland.db
+
+# Environment
+.env
+.env.*
+
+# macOS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/

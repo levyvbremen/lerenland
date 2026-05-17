@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>LerenLand Avontuur 🌟</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg:     #050518;
+      --kaart:  #0d0d3a;
+      --accent: #6c63ff;
+      --acc2:   #00d4ff;
+      --tekst:  #ffffff;
+      --dim:    rgba(255,255,255,0.55);
+    }
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Nunito',system-ui,sans-serif;background:var(--bg);color:var(--tekst);min-height:100vh;overflow-x:hidden;transition:background 0.7s;}
+
+    /* ── SCHERMEN ── */
+    .scherm{display:none;min-height:100vh;}
+    .scherm.actief{display:flex;flex-direction:column;}
+
+    /* ── SETUP ── */
+    #s-setup{align-items:center;justify-content:flex-start;padding:30px 16px 60px;}
+    .setup-logo{text-align:center;margin-bottom:28px;}
+    .setup-logo .logo-icon{font-size:4.5rem;display:block;animation:bounce 2s ease-in-out infinite;}
+    .setup-logo h1{font-size:2.4rem;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--acc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-top:6px;}
+    .setup-logo p{font-size:0.95rem;font-weight:700;color:var(--dim);margin-top:4px;}
+
+    .setup-kaart{background:rgba(255,255,255,0.07);border:2px solid rgba(255,255,255,0.12);border-radius:28px;padding:28px 24px;width:100%;max-width:580px;backdrop-filter:blur(10px);}
+    .stap-titel{font-size:0.72rem;font-weight:900;text-transform:uppercase;letter-spacing:1.5px;color:var(--acc2);margin-bottom:10px;}
+    .stap-blok{margin-bottom:22px;}
+    .stap-blok:last-child{margin-bottom:0;}
+
+    .naam-input{width:100%;background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.2);border-radius:16px;padding:14px 18px;color:white;font-size:1.2rem;font-weight:800;outline:none;font-family:'Nunito',sans-serif;transition:border-color 0.2s;}
+    .naam-input:focus{border-color:var(--accent);}
+    .naam-input::placeholder{color:rgba(255,255,255,0.3);font-weight:700;}
+
+    .groep-grid{display:grid;grid-template-columns:repeat(8,1fr);gap:7px;}
+    .groep-btn{background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.12);border-radius:12px;padding:11px 4px;color:var(--tekst);font-size:0.9rem;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;transition:all 0.15s;text-align:center;}
+    .groep-btn:hover{transform:scale(1.05);}
+    .groep-btn.actief{background:var(--accent);border-color:var(--accent);color:white;transform:scale(1.1);}
+    .groep-sub{font-size:0.6rem;opacity:0.7;display:block;margin-top:1px;}
+
+    .thema-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;}
+    @media(max-width:500px){.thema-grid{grid-template-columns:repeat(3,1fr);}}
+    .thema-kaart{border-radius:20px;padding:16px 8px 12px;cursor:pointer;text-align:center;border:3px solid transparent;transition:all 0.2s;position:relative;overflow:hidden;}
+    .thema-kaart:hover{transform:translateY(-3px);filter:brightness(1.15);}
+    .thema-kaart.actief{border-color:white;transform:translateY(-3px) scale(1.05);}
+    .thema-kaart .thema-icon{font-size:2.2rem;display:block;margin-bottom:6px;}
+    .thema-kaart .thema-naam{font-size:0.72rem;font-weight:900;color:white;line-height:1.2;}
+
+    .start-btn{width:100%;max-width:580px;background:linear-gradient(135deg,var(--accent),var(--acc2));border:none;border-radius:20px;padding:18px;color:white;font-size:1.2rem;font-weight:900;cursor:pointer;box-shadow:0 6px 30px rgba(108,99,255,0.4);font-family:'Nunito',sans-serif;margin-top:16px;transition:all 0.15s;}
+    .start-btn:hover{transform:translateY(-2px);box-shadow:0 10px 40px rgba(108,99,255,0.5);}
+    .start-btn:active{transform:scale(0.97);}
+    .start-btn:disabled{opacity:0.4;cursor:not-allowed;transform:none;}
+
+    /* ── INTRO ── */
+    #s-intro{align-items:center;justify-content:center;padding:40px 20px;text-align:center;}
+    .intro-icon{font-size:6rem;display:block;animation:bounce 1.5s ease-in-out infinite;margin-bottom:20px;}
+    .intro-niveau{font-size:0.8rem;font-weight:900;text-transform:uppercase;letter-spacing:2px;color:var(--acc2);margin-bottom:8px;}
+    .intro-level-naam{font-size:2rem;font-weight:900;margin-bottom:24px;background:linear-gradient(135deg,var(--accent),var(--acc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .intro-tekst-kaart{background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.12);border-radius:24px;padding:24px 28px;max-width:500px;margin:0 auto 28px;min-height:100px;display:flex;align-items:center;justify-content:center;}
+    .intro-tekst{font-size:1.05rem;font-weight:700;line-height:1.65;color:rgba(255,255,255,0.9);}
+    .intro-cursor{display:inline-block;width:2px;height:1.1em;background:var(--acc2);margin-left:2px;animation:blink 0.8s step-end infinite;vertical-align:text-bottom;}
+    @keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+    .intro-start-btn{background:linear-gradient(135deg,var(--accent),var(--acc2));border:none;border-radius:20px;padding:16px 40px;color:white;font-size:1.1rem;font-weight:900;cursor:pointer;box-shadow:0 6px 30px rgba(108,99,255,0.4);font-family:'Nunito',sans-serif;transition:all 0.15s;}
+    .intro-start-btn:hover{transform:translateY(-2px);}
+
+    /* ── GAME HEADER ── */
+    #s-game{flex:1;}
+    .game-header{background:rgba(0,0,0,0.4);backdrop-filter:blur(12px);border-bottom:1px solid rgba(255,255,255,0.08);padding:10px 16px;position:sticky;top:0;z-index:100;}
+    .gh-rij1{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+    .gh-naam{font-size:0.85rem;font-weight:900;color:var(--dim);}
+    .gh-level{font-size:0.85rem;font-weight:900;color:var(--acc2);}
+    .gh-punten-rij{display:flex;align-items:center;gap:8px;}
+    .gh-punten{font-size:1.2rem;font-weight:900;color:var(--accent);}
+    .gh-sterren{font-size:0.9rem;}
+    .gh-combo{font-size:0.78rem;font-weight:900;background:linear-gradient(135deg,#ff6b6b,#ffd700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;display:none;}
+    .gh-combo.zichtbaar{display:block;}
+    .progress-wrap{background:rgba(255,255,255,0.1);border-radius:10px;height:7px;overflow:hidden;}
+    .progress-bar{height:100%;background:linear-gradient(90deg,var(--accent),var(--acc2));border-radius:10px;transition:width 0.6s cubic-bezier(.34,1.56,.64,1);}
+
+    /* ── GAME MAIN ── */
+    .game-main{flex:1;padding:20px 16px 40px;max-width:600px;margin:0 auto;width:100%;}
+
+    /* LOADING */
+    .laden-kaart{background:rgba(255,255,255,0.06);border:2px solid rgba(255,255,255,0.1);border-radius:24px;padding:40px 24px;text-align:center;}
+    .laden-spinner{width:52px;height:52px;border:5px solid rgba(255,255,255,0.12);border-top-color:var(--accent);border-radius:50%;animation:spin 0.8s linear infinite;margin:0 auto 18px;}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    .laden-tekst{font-size:0.95rem;font-weight:700;color:var(--dim);animation:pulse 1.5s ease-in-out infinite;}
+
+    /* VAK BADGE */
+    .vak-badge{display:inline-block;font-size:0.7rem;font-weight:900;text-transform:uppercase;letter-spacing:1px;border-radius:50px;padding:4px 14px;margin-bottom:12px;}
+    .vak-badge.rekenen{background:rgba(255,107,107,0.2);color:#ff6b6b;border:1px solid rgba(255,107,107,0.3);}
+    .vak-badge.spelling{background:rgba(52,211,153,0.2);color:#34d399;border:1px solid rgba(52,211,153,0.3);}
+    .vak-badge.woordenschat{background:rgba(168,85,247,0.2);color:#c084fc;border:1px solid rgba(168,85,247,0.3);}
+
+    /* VRAAG KAART */
+    .vraag-kaart{background:rgba(255,255,255,0.07);border:2px solid rgba(255,255,255,0.12);border-radius:24px;padding:26px 22px;margin-bottom:16px;}
+    .vraag-nr{font-size:0.68rem;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--dim);margin-bottom:10px;}
+    .vraag-tekst{font-size:1.15rem;font-weight:800;line-height:1.55;color:var(--tekst);}
+
+    /* ANTWOORD */
+    .opties-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px;}
+    .optie-btn{background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.15);border-radius:16px;padding:16px 12px;color:var(--tekst);font-size:1rem;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;text-align:center;transition:all 0.15s;line-height:1.3;}
+    .optie-btn:hover:not(:disabled){background:rgba(255,255,255,0.14);transform:translateY(-2px);}
+    .optie-btn:active:not(:disabled){transform:scale(0.97);}
+    .optie-btn:disabled{cursor:default;}
+    .optie-btn.gekozen{border-color:var(--accent);background:rgba(108,99,255,0.15);}
+    .optie-btn.correct{border-color:#34d399;background:rgba(52,211,153,0.2);color:#34d399;}
+    .optie-btn.fout{border-color:#ef4444;background:rgba(239,68,68,0.15);color:#f87171;}
+
+    .open-wrap{display:flex;gap:10px;margin-bottom:10px;}
+    .open-input{flex:1;background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.2);border-radius:16px;padding:14px 18px;color:white;font-size:1.2rem;font-weight:800;outline:none;font-family:'Nunito',sans-serif;transition:border-color 0.2s;}
+    .open-input:focus{border-color:var(--accent);}
+    .open-input.correct{border-color:#34d399;background:rgba(52,211,153,0.1);}
+    .open-input.fout{border-color:#ef4444;background:rgba(239,68,68,0.08);}
+    .submit-btn{background:linear-gradient(135deg,var(--accent),var(--acc2));border:none;border-radius:16px;padding:14px 22px;color:white;font-size:1.2rem;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;transition:all 0.15s;}
+    .submit-btn:hover{filter:brightness(1.1);}
+    .submit-btn:active{transform:scale(0.95);}
+    .submit-btn:disabled{opacity:0.4;cursor:not-allowed;}
+
+    /* FEEDBACK OVERLAY */
+    .feedback-overlay{position:fixed;bottom:0;left:0;right:0;z-index:200;background:var(--fb-bg,rgba(52,211,153,0.97));border-radius:24px 24px 0 0;padding:24px 20px 36px;transform:translateY(105%);transition:transform 0.35s cubic-bezier(.34,1.56,.64,1);max-width:600px;margin:0 auto;}
+    .feedback-overlay.toon{transform:translateY(0);}
+    .fb-icon{font-size:3rem;display:block;text-align:center;margin-bottom:10px;}
+    .fb-titel{font-size:1.3rem;font-weight:900;text-align:center;color:white;margin-bottom:8px;}
+    .fb-bericht{font-size:0.95rem;font-weight:700;color:rgba(255,255,255,0.85);text-align:center;line-height:1.5;margin-bottom:10px;}
+    .fb-uitleg{background:rgba(0,0,0,0.15);border-radius:14px;padding:10px 16px;font-size:0.88rem;font-weight:700;color:rgba(255,255,255,0.9);line-height:1.5;margin-bottom:16px;display:none;}
+    .fb-uitleg.zichtbaar{display:block;}
+    .fb-punten{font-size:1.1rem;font-weight:900;color:white;text-align:center;margin-bottom:16px;}
+    .fb-verder-btn{width:100%;background:rgba(255,255,255,0.25);border:2px solid rgba(255,255,255,0.5);border-radius:16px;padding:14px;color:white;font-size:1rem;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;transition:all 0.15s;}
+    .fb-verder-btn:hover{background:rgba(255,255,255,0.35);}
+
+    /* COMBO BANNER */
+    .combo-banner{position:fixed;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);z-index:300;background:linear-gradient(135deg,#ff6b6b,#ffd700);border-radius:20px;padding:20px 40px;text-align:center;pointer-events:none;box-shadow:0 20px 60px rgba(0,0,0,0.5);}
+    .combo-banner.toon{animation:comboIn 0.6s cubic-bezier(.34,1.56,.64,1) forwards;}
+    .combo-banner.weg{animation:comboOut 0.4s ease-in forwards;}
+    @keyframes comboIn{0%{transform:translate(-50%,-50%) scale(0) rotate(-10deg)}70%{transform:translate(-50%,-50%) scale(1.1) rotate(3deg)}100%{transform:translate(-50%,-50%) scale(1) rotate(0deg)}}
+    @keyframes comboOut{0%{transform:translate(-50%,-50%) scale(1);opacity:1}100%{transform:translate(-50%,-50%) scale(0.5);opacity:0}}
+    .combo-getal{font-size:3rem;font-weight:900;color:white;text-shadow:0 4px 0 rgba(0,0,0,0.2);display:block;}
+    .combo-tekst{font-size:1rem;font-weight:900;color:rgba(255,255,255,0.9);}
+
+    /* PUNTEN POP */
+    .punten-pop{position:fixed;font-size:1.4rem;font-weight:900;color:var(--accent);pointer-events:none;z-index:400;animation:puntsPop 1s ease-out forwards;}
+    @keyframes puntsPop{0%{transform:translateY(0) scale(1);opacity:1}100%{transform:translateY(-80px) scale(1.3);opacity:0}}
+
+    /* ── LEVEL OVERGANG ── */
+    #s-level{align-items:center;justify-content:center;padding:40px 20px;text-align:center;}
+    .level-viering{font-size:5rem;display:block;animation:bounce 1.2s ease-in-out infinite;margin-bottom:16px;}
+    .level-voltooid{font-size:0.8rem;font-weight:900;text-transform:uppercase;letter-spacing:2px;color:var(--acc2);margin-bottom:6px;}
+    .level-nummer{font-size:3.5rem;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--acc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;line-height:1;margin-bottom:4px;}
+    .level-naam-groot{font-size:1.6rem;font-weight:900;margin-bottom:24px;}
+    .level-tekst-kaart{background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.12);border-radius:24px;padding:22px 26px;max-width:500px;margin:0 auto 24px;font-size:1rem;font-weight:700;line-height:1.65;color:rgba(255,255,255,0.9);}
+    .level-badges-rij{display:flex;gap:12px;flex-wrap:wrap;justify-content:center;margin-bottom:24px;min-height:10px;}
+    .badge-nieuw{background:rgba(255,255,255,0.1);border:2px solid var(--accent);border-radius:16px;padding:10px 16px;text-align:center;animation:fadeIn 0.5s ease;}
+    .badge-nieuw .bn-icon{font-size:2rem;display:block;margin-bottom:4px;}
+    .badge-nieuw .bn-naam{font-size:0.75rem;font-weight:900;color:var(--acc2);}
+    .level-verder-btn{background:linear-gradient(135deg,var(--accent),var(--acc2));border:none;border-radius:20px;padding:16px 44px;color:white;font-size:1.1rem;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;box-shadow:0 6px 30px rgba(108,99,255,0.4);transition:all 0.15s;}
+    .level-verder-btn:hover{transform:translateY(-2px);}
+
+    /* ── EINDE ── */
+    #s-einde{align-items:center;justify-content:flex-start;padding:40px 16px 60px;}
+    .einde-hero{text-align:center;margin-bottom:30px;}
+    .einde-icon{font-size:5.5rem;display:block;animation:bounce 1.5s ease-in-out infinite;margin-bottom:12px;}
+    .einde-titel{font-size:2rem;font-weight:900;background:linear-gradient(135deg,var(--accent),var(--acc2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:8px;}
+    .einde-tekst{font-size:0.95rem;font-weight:700;color:var(--dim);max-width:440px;margin:0 auto;line-height:1.6;}
+    .einde-stats{background:rgba(255,255,255,0.07);border:2px solid rgba(255,255,255,0.12);border-radius:24px;padding:20px;width:100%;max-width:500px;margin-bottom:20px;}
+    .stats-rij{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:16px;}
+    .stat-item{text-align:center;}
+    .stat-getal{font-size:2rem;font-weight:900;color:var(--accent);}
+    .stat-label{font-size:0.65rem;font-weight:900;color:var(--dim);text-transform:uppercase;letter-spacing:0.5px;margin-top:3px;}
+    .vak-scores{display:flex;flex-direction:column;gap:8px;}
+    .vak-score-rij{display:flex;align-items:center;gap:10px;}
+    .vs-label{font-size:0.82rem;font-weight:800;width:100px;flex-shrink:0;}
+    .vs-bar-wrap{flex:1;background:rgba(255,255,255,0.1);border-radius:10px;height:8px;overflow:hidden;}
+    .vs-bar{height:100%;border-radius:10px;transition:width 1s 0.5s;}
+    .vs-getal{font-size:0.82rem;font-weight:900;width:36px;text-align:right;}
+
+    .einde-badges{width:100%;max-width:500px;margin-bottom:20px;}
+    .einde-badges h3{font-size:0.8rem;font-weight:900;text-transform:uppercase;letter-spacing:1px;color:var(--acc2);margin-bottom:12px;}
+    .badges-rij{display:flex;flex-wrap:wrap;gap:8px;}
+    .badge-item{background:rgba(255,255,255,0.08);border-radius:14px;padding:8px 12px;display:flex;align-items:center;gap:8px;}
+    .badge-item .bi-icon{font-size:1.5rem;}
+    .badge-item .bi-info .bi-naam{font-size:0.78rem;font-weight:900;color:var(--tekst);}
+    .badge-item .bi-info .bi-sub{font-size:0.63rem;font-weight:700;color:var(--dim);}
+
+    .einde-btns{display:flex;flex-direction:column;gap:10px;width:100%;max-width:500px;}
+    .einde-btn-primary{background:linear-gradient(135deg,var(--accent),var(--acc2));border:none;border-radius:18px;padding:16px;color:white;font-size:1rem;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;box-shadow:0 6px 30px rgba(108,99,255,0.35);transition:all 0.15s;}
+    .einde-btn-primary:hover{transform:translateY(-2px);}
+    .einde-btn-secondary{background:rgba(255,255,255,0.07);border:2px solid rgba(255,255,255,0.15);border-radius:18px;padding:14px;color:var(--tekst);font-size:0.95rem;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;}
+
+    /* ── ANIMATIES ── */
+    @keyframes fadeIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+    @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.6}}
+    @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+    .shake-anim{animation:shake 0.35s ease;}
+    .fade-in{animation:fadeIn 0.4s ease;}
+
+    /* STERREN REGEN */
+    .ster-regen{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:500;}
+    .ster-item{position:absolute;font-size:1.5rem;animation:sterVal 1.2s ease-out forwards;}
+    @keyframes sterVal{0%{top:-30px;opacity:1;transform:rotate(0)}100%{top:110vh;opacity:0;transform:rotate(360deg)}}
+
+    /* RESPONSIVE */
+    @media(max-width:480px){
+      .opties-grid{grid-template-columns:1fr;}
+      .thema-grid{grid-template-columns:repeat(3,1fr);}
+      .groep-grid{grid-template-columns:repeat(4,1fr);}
+      .stats-rij{grid-template-columns:repeat(3,1fr);}
+    }
+  </style>
+</head>
+<body>
+
+<!-- ─────────────── SETUP ─────────────── -->
+<div class="scherm actief" id="s-setup">
+  <div class="setup-logo">
+    <span class="logo-icon">🌟</span>
+    <h1>LerenLand Avontuur</h1>
+    <p>Leer rekenen, spelling en woordenschat op een avontuurlijke manier!</p>
+  </div>
+
+  <div class="setup-kaart">
+    <!-- NAAM -->
+    <div class="stap-blok">
+      <div class="stap-titel">👋 Wat is jouw naam?</div>
+      <input type="text" class="naam-input" id="naam-input" placeholder="Typ hier jouw naam..." maxlength="20" oninput="checkSetup()">
+    </div>
+
+    <!-- GROEP -->
+    <div class="stap-blok">
+      <div class="stap-titel">📚 In welke groep zit jij?</div>
+      <div class="groep-grid" id="groep-grid">
+        <button class="groep-btn" onclick="kiesGroep(1,this)">1<span class="groep-sub">4-5j</span></button>
+        <button class="groep-btn" onclick="kiesGroep(2,this)">2<span class="groep-sub">5-6j</span></button>
+        <button class="groep-btn" onclick="kiesGroep(3,this)">3<span class="groep-sub">6-7j</span></button>
+        <button class="groep-btn" onclick="kiesGroep(4,this)">4<span class="groep-sub">7-8j</span></button>
+        <button class="groep-btn" onclick="kiesGroep(5,this)">5<span class="groep-sub">8-9j</span></button>
+        <button class="groep-btn" onclick="kiesGroep(6,this)">6<span class="groep-sub">9-10j</span></button>
+        <button class="groep-btn" onclick="kiesGroep(7,this)">7<span class="groep-sub">10-11j</span></button>
+        <button class="groep-btn" onclick="kiesGroep(8,this)">8<span class="groep-sub">11-12j</span></button>
+      </div>
+    </div>
+
+    <!-- THEMA -->
+    <div class="stap-blok">
+      <div class="stap-titel">🗺️ Kies jouw avonturenthema!</div>
+      <div class="thema-grid" id="thema-grid">
+        <div class="thema-kaart" style="background:linear-gradient(145deg,#050518,#1a0f5e)" onclick="kiesThema(0,this)">
+          <span class="thema-icon">🚀</span>
+          <span class="thema-naam">Ruimte&shy;reis</span>
+        </div>
+        <div class="thema-kaart" style="background:linear-gradient(145deg,#2c1810,#5a3020)" onclick="kiesThema(1,this)">
+          <span class="thema-icon">⚔️</span>
+          <span class="thema-naam">Middel&shy;eeuwen</span>
+        </div>
+        <div class="thema-kaart" style="background:linear-gradient(145deg,#020e24,#063a6e)" onclick="kiesThema(2,this)">
+          <span class="thema-icon">🌊</span>
+          <span class="thema-naam">Diepe Oceaan</span>
+        </div>
+        <div class="thema-kaart" style="background:linear-gradient(145deg,#0a1f0a,#1a4a1a)" onclick="kiesThema(3,this)">
+          <span class="thema-icon">🌿</span>
+          <span class="thema-naam">Jungle Expeditie</span>
+        </div>
+        <div class="thema-kaart" style="background:linear-gradient(145deg,#0d0520,#2d0d60)" onclick="kiesThema(4,this)">
+          <span class="thema-icon">🔮</span>
+          <span class="thema-naam">Tovenaars&shy;akademie</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <button class="start-btn" id="start-btn" disabled onclick="startAvontuur()">🌟 Start het avontuur!</button>
+</div>
+
+<!-- ─────────────── INTRO ─────────────── -->
+<div class="scherm" id="s-intro">
+  <span class="intro-icon" id="intro-icon">🚀</span>
+  <div class="intro-niveau" id="intro-niveau">Level 1</div>
+  <div class="intro-level-naam" id="intro-level-naam">De Lancering</div>
+  <div class="intro-tekst-kaart">
+    <p class="intro-tekst" id="intro-tekst"><span id="intro-tekst-inner"></span><span class="intro-cursor"></span></p>
+  </div>
+  <button class="intro-start-btn" id="intro-start-btn" onclick="startSpel()" style="display:none">
+    🎯 Klaar voor de uitdaging!
+  </button>
+</div>
+
+<!-- ─────────────── GAME ─────────────── -->
+<div class="scherm" id="s-game">
+  <header class="game-header">
+    <div class="gh-rij1">
+      <span class="gh-naam" id="gh-naam">Naam</span>
+      <div class="gh-punten-rij">
+        <span class="gh-punten" id="gh-punten">0 pts</span>
+        <span class="gh-sterren" id="gh-sterren">☆</span>
+        <span class="gh-combo" id="gh-combo">🔥 x0</span>
+      </div>
+    </div>
+    <span class="gh-level" id="gh-level-naam">Level 1: De Lancering</span>
+    <div class="progress-wrap" style="margin-top:8px;">
+      <div class="progress-bar" id="progress-bar" style="width:0%"></div>
+    </div>
+  </header>
+
+  <div class="game-main" id="game-main">
+    <!-- LADEN -->
+    <div id="g-laden" class="laden-kaart">
+      <div class="laden-spinner"></div>
+      <div class="laden-tekst" id="laden-tekst">Jouw volgende uitdaging wordt geladen...</div>
+    </div>
+
+    <!-- VRAAG -->
+    <div id="g-vraag" style="display:none">
+      <div class="vak-badge" id="vak-badge">rekenen</div>
+      <div class="vraag-kaart fade-in">
+        <div class="vraag-nr" id="vraag-nr">Vraag 1 van 5</div>
+        <div class="vraag-tekst" id="vraag-tekst">Laden...</div>
+      </div>
+
+      <!-- MEERKEUZE -->
+      <div id="opties-container" style="display:none">
+        <div class="opties-grid" id="opties-grid"></div>
+      </div>
+
+      <!-- OPEN -->
+      <div id="open-container" style="display:none">
+        <div class="open-wrap">
+          <input type="text" class="open-input" id="open-input" placeholder="Jouw antwoord..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" onkeydown="if(event.key==='Enter')submitOpen()">
+          <button class="submit-btn" id="submit-btn" onclick="submitOpen()">✓</button>
+        </div>
+      </div>
+
+      <!-- FOUT HINT (bij open) -->
+      <div id="opnieuw-container" style="display:none;margin-bottom:8px;">
+        <button style="background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.15);border-radius:12px;padding:10px 18px;color:rgba(255,255,255,0.6);font-size:0.82rem;font-weight:700;cursor:pointer;width:100%;font-family:'Nunito',sans-serif;" onclick="laadVraag()">↩ Sla over en ga verder</button>
+      </div>
+    </div>
+
+    <!-- FOUT MELDING -->
+    <div id="g-fout" style="display:none">
+      <div style="background:rgba(239,68,68,0.1);border:2px solid rgba(239,68,68,0.3);border-radius:24px;padding:28px 20px;text-align:center;">
+        <div style="font-size:2.5rem;margin-bottom:12px;">😕</div>
+        <div style="font-size:1rem;font-weight:800;margin-bottom:8px;">Oeps! Er ging iets mis.</div>
+        <div style="font-size:0.85rem;font-weight:700;color:rgba(255,255,255,0.6);margin-bottom:20px;" id="fout-bericht">Probeer het opnieuw.</div>
+        <button onclick="laadVraag()" style="background:linear-gradient(135deg,var(--accent),var(--acc2));border:none;border-radius:14px;padding:14px 28px;color:white;font-size:1rem;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;">🔄 Probeer opnieuw</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- FEEDBACK OVERLAY -->
+  <div class="feedback-overlay" id="feedback-overlay">
+    <span class="fb-icon" id="fb-icon">✅</span>
+    <div class="fb-titel" id="fb-titel">Geweldig!</div>
+    <div class="fb-bericht" id="fb-bericht"></div>
+    <div class="fb-uitleg" id="fb-uitleg"></div>
+    <div class="fb-punten" id="fb-punten"></div>
+    <button class="fb-verder-btn" id="fb-verder-btn" onclick="volgendVraag()">Volgende vraag →</button>
+  </div>
+</div>
+
+<!-- ─────────────── LEVEL OVERGANG ─────────────── -->
+<div class="scherm" id="s-level">
+  <span class="level-viering" id="lv-icon">🎉</span>
+  <div class="level-voltooid">Level voltooid!</div>
+  <div class="level-nummer" id="lv-nummer">1</div>
+  <div class="level-naam-groot" id="lv-naam">De Lancering</div>
+  <div class="level-tekst-kaart" id="lv-tekst">Het avontuur gaat verder...</div>
+  <div class="level-badges-rij" id="lv-badges"></div>
+  <button class="level-verder-btn" id="lv-btn" onclick="volgendLevel()">
+    Level 2 beginnen! →
+  </button>
+</div>
+
+<!-- ─────────────── EINDE ─────────────── -->
+<div class="scherm" id="s-einde">
+  <div class="einde-hero">
+    <span class="einde-icon" id="e-icon">🏆</span>
+    <div class="einde-titel" id="e-titel">Avontuur voltooid!</div>
+    <div class="einde-tekst" id="e-tekst">Geweldig!</div>
+  </div>
+
+  <div class="einde-stats">
+    <div class="stats-rij">
+      <div class="stat-item"><div class="stat-getal" id="e-totaal">0</div><div class="stat-label">Vragen</div></div>
+      <div class="stat-item"><div class="stat-getal" id="e-correct">0</div><div class="stat-label">Goed</div></div>
+      <div class="stat-item"><div class="stat-getal" id="e-punten">0</div><div class="stat-label">Punten</div></div>
+    </div>
+    <div class="vak-scores">
+      <div class="vak-score-rij">
+        <span class="vs-label" style="color:#ff6b6b;">🔢 Rekenen</span>
+        <div class="vs-bar-wrap"><div class="vs-bar" id="vs-reken" style="background:linear-gradient(90deg,#ff6b6b,#ff8e53);width:0%"></div></div>
+        <span class="vs-getal" id="vg-reken">0%</span>
+      </div>
+      <div class="vak-score-rij">
+        <span class="vs-label" style="color:#34d399;">✏️ Spelling</span>
+        <div class="vs-bar-wrap"><div class="vs-bar" id="vs-spell" style="background:linear-gradient(90deg,#34d399,#38bdf8);width:0%"></div></div>
+        <span class="vs-getal" id="vg-spell">0%</span>
+      </div>
+      <div class="vak-score-rij">
+        <span class="vs-label" style="color:#c084fc;">📚 Woorden</span>
+        <div class="vs-bar-wrap"><div class="vs-bar" id="vs-woord" style="background:linear-gradient(90deg,#c084fc,#e040fb);width:0%"></div></div>
+        <span class="vs-getal" id="vg-woord">0%</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="einde-badges" id="e-badges-wrap">
+    <h3>🏅 Verdiende badges</h3>
+    <div class="badges-rij" id="e-badges"></div>
+  </div>
+
+  <div class="einde-btns">
+    <button class="einde-btn-primary" onclick="opnieuwSpelen()">🔄 Opnieuw spelen</button>
+    <button class="einde-btn-secondary" onclick="wissel()">🎨 Ander thema kiezen</button>
+    <button class="einde-btn-secondary" onclick="window.location='/'">← Terug naar LerenLand</button>
+  </div>
+</div>
+
+<!-- COMBO BANNER -->
+<div class="combo-banner" id="combo-banner">
+  <span class="combo-getal" id="combo-getal">5x</span>
+  <span class="combo-tekst" id="combo-tekst">COMBO! 🔥</span>
+</div>
+
+<!-- STER REGEN -->
+<div class="ster-regen" id="ster-regen"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+// CONFIGURATIE
+// ═══════════════════════════════════════════════
+
+const THEMAS = [
+  { naam:'Ruimtereis',    icon:'🚀', bg:'#050518', kaart:'#0d0d3a', accent:'#6c63ff', acc2:'#00d4ff', lader:'De ruimtecomputer berekent jouw volgende missie...' },
+  { naam:'Middeleeuwen',  icon:'⚔️', bg:'#1a0e08', kaart:'#2d1a0f', accent:'#c9a227', acc2:'#e67e22', lader:'De hofwijze bedenkt jouw volgende uitdaging...' },
+  { naam:'Diepe oceaan',  icon:'🌊', bg:'#020e24', kaart:'#0a1f3d', accent:'#00b4d8', acc2:'#48cae4', lader:'De zeegod bereidt jouw volgende opdracht voor...' },
+  { naam:'Jungle-expeditie', icon:'🌿', bg:'#0a1f0a', kaart:'#142814', accent:'#52b788', acc2:'#95d5b2', lader:'De jungle-gids zoekt jouw volgende uitdaging...' },
+  { naam:'Tovenaarsakademie', icon:'🔮', bg:'#0d0520', kaart:'#1a0840', accent:'#e040fb', acc2:'#ce93d8', lader:'De tovenaar brouwt jouw volgende uitdaging...' },
+];
+
+const LEVEL_NAMEN = {
+  'Ruimtereis':         ['De Lancering','Eerste Contact','Asteroïdenveld','Maanlandingsplaats','Mars-basis','Jupitermanen','Saturnusringen','Interstellaire Reis','Het Zwarte Gat','Het Universum'],
+  'Middeleeuwen':       ['Het Kasteel','De Wachttoren','Ridderstoernooi','De Drakenkuil','Belegering','Het Ridderzwaard','De Koningstroon','Het Drakenei','Betoverd Woud','Legendarische Held'],
+  'Diepe oceaan':       ['De Duik','Het Koraalrif','Octopustuin','Het Wrakschip','Diepzeetunnel','Zeemonstergrot','Verloren Stad','Bioluminescente Diepte','Titanengrot','Het Diepste Punt'],
+  'Jungle-expeditie':   ['Het Junglepad','Rivieroverstap','Verloren Tempel','Jaguarterritorium','De Waterval','Slangennest','Verhoogd Pad','Bij de Stamhoofd','Verborgen Schat','Jungle Held'],
+  'Tovenaarsakademie':  ['De Magische Poort','Eerste Spreuk','De Heksenkeuken','Magische Bibliotheek','Toverstoktraining','De Drakenles','De Grote Proef','Magisch Duel','Geheim Archief','Grootmeester'],
+};
+
+const VAKKEN = ['rekenen','spelling','woordenschat'];
+const NIVEAU_MAP = {'-2':'heel makkelijk','-1':'makkelijk','0':'normaal','1':'uitdagend','2':'heel moeilijk'};
+
+const BADGE_DEFS = [
+  { id:'eerste',   icon:'🌱', naam:'Eerste Stap',  sub:'Eerste goede antwoord!',      check:()=>gs.sessie.correct>=1 },
+  { id:'combo5',   icon:'🔥', naam:'Op Dreef',      sub:'5 goede op rij!',             check:()=>gs.maxCombo>=5 },
+  { id:'combo10',  icon:'⚡', naam:'Bliksem',        sub:'10 goede op rij!',            check:()=>gs.maxCombo>=10 },
+  { id:'reken10',  icon:'🔢', naam:'Rekenaar',       sub:'10 rekenvragen goed',         check:()=>gs.sessie.rekenGoed>=10 },
+  { id:'spell10',  icon:'✏️', naam:'Speller',        sub:'10 spellingvragen goed',      check:()=>gs.sessie.spellGoed>=10 },
+  { id:'woord10',  icon:'📚', naam:'Lezer',           sub:'10 woordenschatvragen goed', check:()=>gs.sessie.woordGoed>=10 },
+  { id:'punten50', icon:'⭐', naam:'Ster',            sub:'50 punten behaald!',          check:()=>gs.punten>=50 },
+  { id:'punten150',icon:'🏆', naam:'Kampioen',        sub:'150 punten behaald!',         check:()=>gs.punten>=150 },
+  { id:'level5',   icon:'🚀', naam:'Avonturier',      sub:'Level 5 bereikt!',            check:()=>gs.level>=5 },
+  { id:'einde',    icon:'👑', naam:'Grootmeester',    sub:'Alle 10 levels voltooid!',    check:()=>gs.level>=10 },
+];
+
+const FALLBACK = {
+  rekenen:       { vraagTekst:'Hoeveel is 7 + 8?', vraagType:'meerkeuze', opties:['13','14','15','16'], correctAntwoord:'15', uitleg:'7 + 8 = 15. Tel 8 stappen verder vanaf 7.', feedbackPositief:'Super gerekend!' },
+  spelling:      { vraagTekst:'Welk woord is correct gespeld?', vraagType:'meerkeuze', opties:['schoool','school','schol','scoohl'], correctAntwoord:'school', uitleg:'School schrijf je: s-c-h-o-o-l.', feedbackPositief:'Jij kunt goed spellen!' },
+  woordenschat:  { vraagTekst:'Wat betekent "vrolijk"?', vraagType:'meerkeuze', opties:['blij en opgewekt','boos en verdrietig','moe en slaperig','hongerig'], correctAntwoord:'blij en opgewekt', uitleg:'Vrolijk betekent dat je je blij en opgewekt voelt.', feedbackPositief:'Uitstekend! Je kent veel woorden!' },
+};
+
+// ═══════════════════════════════════════════════
+// GAME STATE
+// ═══════════════════════════════════════════════
+let gs = {
+  naam:'', groep:4, themaIdx:0,
+  level:1, levelNaam:'',
+  punten:0, badges:[],
+  niveau:0, correcteReeks:0, fouteReeks:0, combo:0, maxCombo:0,
+  vragenDitLevel:0, vragenPerLevel:5, vakIdx:0, vraagNr:0,
+  huidigVraag:null, beantwoord:false, vraagStart:0,
+  apiMislukt:0,
+  sessie:{ totaal:0, correct:0, rekenTot:0, spellTot:0, woordTot:0, rekenGoed:0, spellGoed:0, woordGoed:0 }
+};
+
+let gekozenGroep = null;
+let gekozenThemaIdx = null;
+let nieuwBadgesThisLevel = [];
+
+// ═══════════════════════════════════════════════
+// THEMA TOEPASSEN
+// ═══════════════════════════════════════════════
+function pasThemaToe(idx) {
+  const t = THEMAS[idx];
+  const r = document.documentElement;
+  r.style.setProperty('--bg', t.bg);
+  r.style.setProperty('--kaart', t.kaart);
+  r.style.setProperty('--accent', t.accent);
+  r.style.setProperty('--acc2', t.acc2);
+  r.style.setProperty('--tekst', '#ffffff');
+  document.body.style.background = t.bg;
+}
+
+// ═══════════════════════════════════════════════
+// SETUP
+// ═══════════════════════════════════════════════
+function kiesGroep(g, btn) {
+  gekozenGroep = g;
+  document.querySelectorAll('.groep-btn').forEach(b => b.classList.remove('actief'));
+  btn.classList.add('actief');
+  checkSetup();
+}
+
+function kiesThema(idx, kaart) {
+  gekozenThemaIdx = idx;
+  document.querySelectorAll('.thema-kaart').forEach(k => k.classList.remove('actief'));
+  kaart.classList.add('actief');
+  pasThemaToe(idx);
+  checkSetup();
+}
+
+function checkSetup() {
+  const naam = document.getElementById('naam-input').value.trim();
+  const ok = naam.length >= 2 && gekozenGroep !== null && gekozenThemaIdx !== null;
+  document.getElementById('start-btn').disabled = !ok;
+}
+
+async function startAvontuur() {
+  const naam = document.getElementById('naam-input').value.trim();
+  gs.naam = naam;
+  gs.groep = gekozenGroep;
+  gs.themaIdx = gekozenThemaIdx;
+  gs.level = 1;
+  gs.levelNaam = LEVEL_NAMEN[THEMAS[gs.themaIdx].naam][0];
+
+  // Laad opgeslagen state als die er is (zelfde naam + thema)
+  const opgeslagen = laadState();
+  if (opgeslagen && opgeslagen.naam === gs.naam && opgeslagen.themaIdx === gs.themaIdx) {
+    Object.assign(gs, opgeslagen);
+    pasThemaToe(gs.themaIdx);
+  }
+
+  toonScherm('s-intro');
+  laadIntroTekst('intro');
+}
+
+async function laadIntroTekst(soort) {
+  const thema = THEMAS[gs.themaIdx];
+  document.getElementById('intro-icon').textContent = thema.icon;
+  document.getElementById('intro-niveau').textContent = `Level ${gs.level}`;
+  document.getElementById('intro-level-naam').textContent = gs.levelNaam;
+  document.getElementById('intro-tekst-inner').textContent = '';
+  document.getElementById('intro-start-btn').style.display = 'none';
+
+  try {
+    const r = await fetch('/api/avontuur-tekst', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ thema: thema.naam, level: gs.level, level_naam: gs.levelNaam, soort: soort, naam: gs.naam })
+    });
+    const d = await r.json();
+    typewriter(d.tekst, 'intro-tekst-inner', () => {
+      document.getElementById('intro-start-btn').style.display = 'block';
+    });
+  } catch(e) {
+    document.getElementById('intro-tekst-inner').textContent = `Welkom bij het avontuur, ${gs.naam}! Jouw uitdaging begint nu!`;
+    document.getElementById('intro-start-btn').style.display = 'block';
+  }
+}
+
+function startSpel() {
+  toonScherm('s-game');
+  updateHeader();
+  laadVraag();
+}
+
+// ═══════════════════════════════════════════════
+// GAME LOOP
+// ═══════════════════════════════════════════════
+async function laadVraag() {
+  document.getElementById('g-laden').style.display = 'block';
+  document.getElementById('g-vraag').style.display = 'none';
+  document.getElementById('g-fout').style.display = 'none';
+  document.getElementById('feedback-overlay').classList.remove('toon');
+
+  const thema = THEMAS[gs.themaIdx];
+  document.getElementById('laden-tekst').textContent = thema.lader;
+
+  const vak = VAKKEN[gs.vakIdx % VAKKEN.length];
+
+  try {
+    const r = await fetch('/api/avontuur-vraag', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        groep: gs.groep, vak, thema: thema.naam,
+        level: gs.level, niveau: gs.niveau,
+        level_naam: gs.levelNaam
+      })
+    });
+    const d = await r.json();
+
+    if (!d.succes) throw new Error(d.fout || 'API fout');
+
+    gs.apiMislukt = 0;
+    gs.huidigVraag = d;
+    gs.beantwoord = false;
+    gs.vraagStart = Date.now();
+    gs.vragenDitLevel++;
+    gs.vraagNr++;
+    gs.sessie.totaal++;
+
+    document.getElementById('g-laden').style.display = 'none';
+    document.getElementById('g-vraag').style.display = 'block';
+    toonVraag(d, vak);
+
+  } catch(e) {
+    gs.apiMislukt++;
+    if (gs.apiMislukt >= 2) {
+      // Gebruik fallback
+      const fallback = FALLBACK[vak];
+      gs.huidigVraag = fallback;
+      gs.beantwoord = false;
+      gs.vraagStart = Date.now();
+      gs.vragenDitLevel++;
+      gs.vraagNr++;
+      gs.sessie.totaal++;
+      gs.apiMislukt = 0;
+      document.getElementById('g-laden').style.display = 'none';
+      document.getElementById('g-vraag').style.display = 'block';
+      toonVraag(fallback, vak);
+    } else {
+      document.getElementById('g-laden').style.display = 'none';
+      document.getElementById('g-fout').style.display = 'block';
+      document.getElementById('fout-bericht').textContent = e.message || 'De server reageert niet.';
+    }
+  }
+}
+
+function toonVraag(vraag, vak) {
+  // Vak badge
+  const badge = document.getElementById('vak-badge');
+  badge.className = `vak-badge ${vak}`;
+  const vakLabels = { rekenen:'🔢 Rekenen', spelling:'✏️ Spelling', woordenschat:'📚 Woordenschat' };
+  badge.textContent = vakLabels[vak];
+
+  document.getElementById('vraag-nr').textContent = `Vraag ${gs.vragenDitLevel} van ${gs.vragenPerLevel} — Level ${gs.level}`;
+  document.getElementById('vraag-tekst').textContent = vraag.vraagTekst;
+
+  document.getElementById('opties-container').style.display = 'none';
+  document.getElementById('open-container').style.display = 'none';
+  document.getElementById('opnieuw-container').style.display = 'none';
+
+  if (vraag.vraagType === 'meerkeuze' && vraag.opties) {
+    document.getElementById('opties-container').style.display = 'block';
+    const grid = document.getElementById('opties-grid');
+    grid.innerHTML = '';
+    vraag.opties.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = 'optie-btn';
+      btn.textContent = opt;
+      btn.onclick = () => controleerMeerkeuze(opt, btn);
+      grid.appendChild(btn);
+    });
+  } else {
+    document.getElementById('open-container').style.display = 'block';
+    const inp = document.getElementById('open-input');
+    inp.value = '';
+    inp.className = 'open-input';
+    inp.disabled = false;
+    document.getElementById('submit-btn').disabled = false;
+    setTimeout(() => inp.focus(), 100);
+  }
+
+  updateProgress();
+}
+
+function controleerMeerkeuze(gekozen, btn) {
+  if (gs.beantwoord) return;
+  gs.beantwoord = true;
+
+  document.querySelectorAll('.optie-btn').forEach(b => { b.disabled = true; });
+  btn.classList.add('gekozen');
+
+  const goed = normaliseer(gekozen) === normaliseer(gs.huidigVraag.correctAntwoord);
+
+  // Markeer knoppen
+  document.querySelectorAll('.optie-btn').forEach(b => {
+    if (normaliseer(b.textContent) === normaliseer(gs.huidigVraag.correctAntwoord)) b.classList.add('correct');
+    else if (b === btn && !goed) b.classList.add('fout');
+  });
+
+  verwerkAntwoord(goed, VAKKEN[gs.vakIdx % VAKKEN.length]);
+}
+
+function submitOpen() {
+  if (gs.beantwoord) return;
+  const inp = document.getElementById('open-input');
+  const val = inp.value.trim();
+  if (!val) { inp.focus(); return; }
+
+  gs.beantwoord = true;
+  inp.disabled = true;
+  document.getElementById('submit-btn').disabled = true;
+
+  const goed = normaliseer(val) === normaliseer(gs.huidigVraag.correctAntwoord);
+  inp.classList.add(goed ? 'correct' : 'fout');
+
+  verwerkAntwoord(goed, VAKKEN[gs.vakIdx % VAKKEN.length]);
+}
+
+function normaliseer(s) {
+  return String(s).trim().toLowerCase()
+    .replace(/[.,;:!?]/g, '')
+    .replace(/\s+/g, ' ');
+}
+
+function verwerkAntwoord(goed, vak) {
+  const snelheid = Date.now() - gs.vraagStart;
+  let puntsDelta = 0;
+  let puntsTekst = '';
+
+  if (goed) {
+    gs.correcteReeks++;
+    gs.fouteReeks = 0;
+    gs.combo++;
+    gs.maxCombo = Math.max(gs.maxCombo, gs.combo);
+
+    puntsDelta = 10;
+    if (snelheid < 10000) { puntsDelta += 5; } // snel bonus
+    if (gs.combo >= 5) { puntsDelta += 5; }     // combo bonus
+
+    gs.punten += puntsDelta;
+    puntsTekst = `+${puntsDelta} punten!${snelheid < 10000 ? ' ⚡ Snel!' : ''}${gs.combo >= 5 ? ' 🔥 Combo!' : ''}`;
+
+    gs.sessie.correct++;
+    if (vak === 'rekenen')      { gs.sessie.rekenTot++; gs.sessie.rekenGoed++; }
+    if (vak === 'spelling')     { gs.sessie.spellTot++; gs.sessie.spellGoed++; }
+    if (vak === 'woordenschat') { gs.sessie.woordTot++; gs.sessie.woordGoed++; }
+
+    // Adaptief omhoog
+    if (gs.correcteReeks >= 3) { gs.niveau = Math.min(2, gs.niveau + 1); gs.correcteReeks = 0; }
+
+    // Combo banner
+    if (gs.combo % 5 === 0 && gs.combo > 0) toonComboBanner();
+
+    // Punten pop
+    toonPuntenPop('+' + puntsDelta);
+    sterRegen();
+
+    toonFeedback(true, gs.huidigVraag.feedbackPositief, gs.huidigVraag.uitleg, puntsTekst);
+
+  } else {
+    gs.fouteReeks++;
+    gs.correcteReeks = 0;
+    gs.combo = 0;
+    puntsTekst = '0 punten';
+
+    if (vak === 'rekenen')      gs.sessie.rekenTot++;
+    if (vak === 'spelling')     gs.sessie.spellTot++;
+    if (vak === 'woordenschat') gs.sessie.woordTot++;
+
+    // Adaptief omlaag
+    if (gs.fouteReeks >= 2) { gs.niveau = Math.max(-2, gs.niveau - 1); gs.fouteReeks = 0; }
+
+    toonFeedback(false, `Het goede antwoord is: "${gs.huidigVraag.correctAntwoord}"`, gs.huidigVraag.uitleg, puntsTekst);
+  }
+
+  // Badges checken
+  controleerBadges();
+  updateHeader();
+  slaState();
+}
+
+function toonFeedback(goed, bericht, uitleg, puntsTekst) {
+  const ov = document.getElementById('feedback-overlay');
+  ov.style.setProperty('--fb-bg', goed ? 'rgba(22,163,74,0.97)' : 'rgba(185,28,28,0.97)');
+  ov.style.background = goed ? 'rgba(22,163,74,0.97)' : 'rgba(185,28,28,0.97)';
+
+  document.getElementById('fb-icon').textContent   = goed ? '✅' : '❌';
+  document.getElementById('fb-titel').textContent  = goed ? gs.huidigVraag.feedbackPositief : 'Niet helemaal goed...';
+  document.getElementById('fb-bericht').textContent = goed ? '' : bericht;
+  document.getElementById('fb-punten').textContent  = puntsTekst;
+
+  const uitlegEl = document.getElementById('fb-uitleg');
+  uitlegEl.textContent = uitleg;
+  uitlegEl.classList.toggle('zichtbaar', !!uitleg);
+
+  const btn = document.getElementById('fb-verder-btn');
+  btn.textContent = 'Volgende vraag →';
+
+  setTimeout(() => ov.classList.add('toon'), 100);
+
+  // Auto-verder na 2s bij goed antwoord
+  if (goed) {
+    setTimeout(() => { if (document.getElementById('feedback-overlay').classList.contains('toon')) volgendVraag(); }, 2200);
+  }
+}
+
+function volgendVraag() {
+  document.getElementById('feedback-overlay').classList.remove('toon');
+
+  // Volgende vak
+  gs.vakIdx++;
+
+  // Level check
+  if (gs.vragenDitLevel >= gs.vragenPerLevel) {
+    gs.vragenDitLevel = 0;
+    setTimeout(() => toonLevelOvergang(), 400);
+  } else {
+    setTimeout(() => laadVraag(), 300);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// LEVEL OVERGANG
+// ═══════════════════════════════════════════════
+async function toonLevelOvergang() {
+  const t = THEMAS[gs.themaIdx];
+
+  document.getElementById('lv-icon').textContent = t.icon;
+  document.getElementById('lv-nummer').textContent = `Level ${gs.level}`;
+  document.getElementById('lv-naam').textContent = gs.levelNaam;
+  document.getElementById('lv-tekst').textContent = 'Het verhaal laadt...';
+
+  // Nieuwe badges tonen
+  const lvBadges = document.getElementById('lv-badges');
+  lvBadges.innerHTML = '';
+  nieuwBadgesThisLevel.forEach(b => {
+    const div = document.createElement('div');
+    div.className = 'badge-nieuw';
+    div.innerHTML = `<span class="bn-icon">${b.icon}</span><div class="bn-naam">${b.naam}</div>`;
+    lvBadges.appendChild(div);
+  });
+  nieuwBadgesThisLevel = [];
+
+  // Volgende level knop
+  if (gs.level >= 10) {
+    document.getElementById('lv-btn').textContent = '🏆 Avontuur voltooien!';
+    document.getElementById('lv-btn').onclick = toonEinde;
+  } else {
+    document.getElementById('lv-btn').textContent = `Level ${gs.level + 1} beginnen! →`;
+    document.getElementById('lv-btn').onclick = volgendLevel;
+  }
+
+  toonScherm('s-level');
+  sterRegen();
+
+  // Laad verhaal
+  try {
+    const r = await fetch('/api/avontuur-tekst', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ thema: t.naam, level: gs.level, level_naam: gs.levelNaam, soort: 'level_overgang', naam: gs.naam })
+    });
+    const d = await r.json();
+    document.getElementById('lv-tekst').textContent = d.tekst;
+  } catch(e) {
+    document.getElementById('lv-tekst').textContent = `Goed gedaan, ${gs.naam}! Je hebt level ${gs.level} voltooid. Ga naar het volgende avontuur!`;
+  }
+}
+
+function volgendLevel() {
+  gs.level++;
+  gs.levelNaam = LEVEL_NAMEN[THEMAS[gs.themaIdx].naam][gs.level - 1] || `Level ${gs.level}`;
+  gs.vragenDitLevel = 0;
+  controleerBadges();
+  updateHeader();
+  slaState();
+  toonScherm('s-game');
+  laadVraag();
+}
+
+// ═══════════════════════════════════════════════
+// EINDE
+// ═══════════════════════════════════════════════
+async function toonEinde() {
+  const t = THEMAS[gs.themaIdx];
+  document.getElementById('e-icon').textContent = t.icon;
+  document.getElementById('e-titel').textContent = 'Avontuur voltooid! 🏆';
+
+  // Stats
+  document.getElementById('e-totaal').textContent  = gs.sessie.totaal;
+  document.getElementById('e-correct').textContent = gs.sessie.correct;
+  document.getElementById('e-punten').textContent  = gs.punten;
+
+  const pct = (g, t) => t > 0 ? Math.round(g/t*100) : 0;
+  const pr = pct(gs.sessie.rekenGoed, gs.sessie.rekenTot);
+  const ps = pct(gs.sessie.spellGoed, gs.sessie.spellTot);
+  const pw = pct(gs.sessie.woordGoed, gs.sessie.woordTot);
+  setTimeout(() => {
+    document.getElementById('vs-reken').style.width = pr+'%';
+    document.getElementById('vs-spell').style.width = ps+'%';
+    document.getElementById('vs-woord').style.width = pw+'%';
+  }, 300);
+  document.getElementById('vg-reken').textContent = pr+'%';
+  document.getElementById('vg-spell').textContent = ps+'%';
+  document.getElementById('vg-woord').textContent = pw+'%';
+
+  // Badges
+  const badgesEl = document.getElementById('e-badges');
+  badgesEl.innerHTML = '';
+  gs.badges.forEach(b => {
+    const div = document.createElement('div');
+    div.className = 'badge-item';
+    div.innerHTML = `<span class="bi-icon">${b.icon}</span><div class="bi-info"><div class="bi-naam">${b.naam}</div><div class="bi-sub">${b.sub}</div></div>`;
+    badgesEl.appendChild(div);
+  });
+  if (gs.badges.length === 0) badgesEl.textContent = 'Speel meer om badges te verdienen!';
+
+  toonScherm('s-einde');
+  sterRegen();
+
+  // AI eindtekst
+  try {
+    const r = await fetch('/api/avontuur-tekst', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({ thema: t.naam, level: gs.level, soort: 'einde', naam: gs.naam })
+    });
+    const d = await r.json();
+    document.getElementById('e-tekst').textContent = d.tekst;
+  } catch(e) {
+    document.getElementById('e-tekst').textContent = `Wauw, ${gs.naam}! Je hebt alle levels voltooid. Jij bent een echte held!`;
+  }
+
+  // Wis opgeslagen state
+  localStorage.removeItem('ll_avontuur');
+}
+
+// ═══════════════════════════════════════════════
+// BADGES
+// ═══════════════════════════════════════════════
+function controleerBadges() {
+  BADGE_DEFS.forEach(def => {
+    if (!gs.badges.find(b => b.id === def.id) && def.check()) {
+      gs.badges.push({ id:def.id, icon:def.icon, naam:def.naam, sub:def.sub });
+      nieuwBadgesThisLevel.push({ icon:def.icon, naam:def.naam });
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════
+// UI HELPERS
+// ═══════════════════════════════════════════════
+function updateHeader() {
+  const t = THEMAS[gs.themaIdx];
+  document.getElementById('gh-naam').textContent = gs.naam;
+  document.getElementById('gh-level-naam').textContent = `${t.icon} Level ${gs.level}: ${gs.levelNaam}`;
+  document.getElementById('gh-punten').textContent = gs.punten + ' pts';
+
+  const sterren = Math.min(5, Math.floor(gs.punten / 30));
+  document.getElementById('gh-sterren').textContent = '⭐'.repeat(sterren) + '☆'.repeat(5-sterren);
+
+  const comboEl = document.getElementById('gh-combo');
+  if (gs.combo >= 3) {
+    comboEl.textContent = `🔥 x${gs.combo}`;
+    comboEl.classList.add('zichtbaar');
+  } else {
+    comboEl.classList.remove('zichtbaar');
+  }
+}
+
+function updateProgress() {
+  const pct = Math.min(100, ((gs.vragenDitLevel - 1) / gs.vragenPerLevel) * 100);
+  document.getElementById('progress-bar').style.width = pct + '%';
+}
+
+function toonScherm(id) {
+  document.querySelectorAll('.scherm').forEach(s => s.classList.remove('actief'));
+  document.getElementById(id).classList.add('actief');
+}
+
+function toonComboBanner() {
+  const banner = document.getElementById('combo-banner');
+  document.getElementById('combo-getal').textContent = `${gs.combo}x`;
+  document.getElementById('combo-tekst').textContent = gs.combo >= 10 ? 'SUPER COMBO! 🔥⚡' : 'COMBO! 🔥';
+  banner.style.transform = '';
+  banner.classList.remove('weg');
+  banner.classList.add('toon');
+  setTimeout(() => {
+    banner.classList.remove('toon');
+    banner.classList.add('weg');
+    setTimeout(() => { banner.classList.remove('weg'); }, 400);
+  }, 2000);
+}
+
+function toonPuntenPop(tekst) {
+  const el = document.createElement('div');
+  el.className = 'punten-pop';
+  el.textContent = tekst;
+  el.style.left = (Math.random() * 60 + 20) + '%';
+  el.style.top = '30%';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1000);
+}
+
+function sterRegen() {
+  const container = document.getElementById('ster-regen');
+  const symbolen = ['⭐','🌟','✨','💫','🎉'];
+  for (let i = 0; i < 12; i++) {
+    const s = document.createElement('div');
+    s.className = 'ster-item';
+    s.textContent = symbolen[Math.floor(Math.random() * symbolen.length)];
+    s.style.left = Math.random() * 100 + 'vw';
+    s.style.animationDuration = (0.8 + Math.random() * 0.8) + 's';
+    s.style.animationDelay = Math.random() * 0.6 + 's';
+    container.appendChild(s);
+    setTimeout(() => s.remove(), 1600);
+  }
+}
+
+// ═══════════════════════════════════════════════
+// TYPEWRITER
+// ═══════════════════════════════════════════════
+function typewriter(tekst, elId, callback) {
+  const el = document.getElementById(elId);
+  el.textContent = '';
+  let i = 0;
+  const interval = setInterval(() => {
+    el.textContent += tekst[i];
+    i++;
+    if (i >= tekst.length) {
+      clearInterval(interval);
+      if (callback) callback();
+    }
+  }, 28);
+}
+
+// ═══════════════════════════════════════════════
+// LOCAL STORAGE
+// ═══════════════════════════════════════════════
+function slaState() {
+  try { localStorage.setItem('ll_avontuur', JSON.stringify(gs)); } catch(e) {}
+}
+
+function laadState() {
+  try {
+    const d = localStorage.getItem('ll_avontuur');
+    return d ? JSON.parse(d) : null;
+  } catch(e) { return null; }
+}
+
+// ═══════════════════════════════════════════════
+// OPNIEUW / WISSEL
+// ═══════════════════════════════════════════════
+function opnieuwSpelen() {
+  gs.level = 1;
+  gs.levelNaam = LEVEL_NAMEN[THEMAS[gs.themaIdx].naam][0];
+  gs.punten = 0;
+  gs.badges = [];
+  gs.niveau = 0;
+  gs.correcteReeks = 0; gs.fouteReeks = 0;
+  gs.combo = 0; gs.maxCombo = 0;
+  gs.vragenDitLevel = 0; gs.vakIdx = 0; gs.vraagNr = 0;
+  gs.sessie = { totaal:0, correct:0, rekenTot:0, spellTot:0, woordTot:0, rekenGoed:0, spellGoed:0, woordGoed:0 };
+  nieuwBadgesThisLevel = [];
+  slaState();
+  toonScherm('s-intro');
+  laadIntroTekst('intro');
+}
+
+function wissel() {
+  slaState();
+  // Reset setup keuzes maar behoud naam
+  gekozenGroep = gs.groep;
+  gekozenThemaIdx = null;
+  document.getElementById('naam-input').value = gs.naam;
+  document.querySelectorAll('.groep-btn').forEach((b,i) => {
+    b.classList.toggle('actief', i + 1 === gs.groep);
+  });
+  document.querySelectorAll('.thema-kaart').forEach(k => k.classList.remove('actief'));
+  document.getElementById('start-btn').disabled = true;
+  toonScherm('s-setup');
+}
+
+// ═══════════════════════════════════════════════
+// INIT: herstel state als die er is
+// ═══════════════════════════════════════════════
+(function init() {
+  const opgeslagen = laadState();
+  if (opgeslagen && opgeslagen.naam && opgeslagen.themaIdx !== undefined) {
+    // Pre-fill setup
+    document.getElementById('naam-input').value = opgeslagen.naam;
+    gekozenThemaIdx = opgeslagen.themaIdx;
+    gekozenGroep = opgeslagen.groep;
+    pasThemaToe(opgeslagen.themaIdx);
+    document.querySelectorAll('.groep-btn').forEach((b, i) => {
+      b.classList.toggle('actief', i + 1 === opgeslagen.groep);
+    });
+    document.querySelectorAll('.thema-kaart').forEach((k, i) => {
+      k.classList.toggle('actief', i === opgeslagen.themaIdx);
+    });
+    document.getElementById('start-btn').disabled = false;
+  }
+})();
+</script>
+</body>
+</html>

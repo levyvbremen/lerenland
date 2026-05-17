@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>TafelTijger 🐯</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Nunito',system-ui,sans-serif;background:linear-gradient(135deg,#2d1b69,#11998e);min-height:100vh;color:white;display:flex;flex-direction:column;align-items:center;padding:20px;}
+    .terug{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.5);text-decoration:none;font-size:0.85rem;margin-bottom:16px;align-self:flex-start;font-weight:700;}
+    .terug:hover{color:white;}
+    .header{text-align:center;margin-bottom:20px;}
+    .logo{font-size:2rem;}
+    .titel{font-size:1.5rem;font-weight:900;background:linear-gradient(135deg,#a78bfa,#38bdf8);-webkit-background-clip:text;-webkit-text-fill-color:transparent;}
+    .card{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:24px;padding:24px;width:100%;max-width:500px;backdrop-filter:blur(10px);}
+    .vraag{font-size:0.95rem;font-weight:800;margin-bottom:12px;}
+    .tafel-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:20px;}
+    .tafel-btn{background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.15);border-radius:12px;padding:12px 6px;color:white;font-size:1rem;font-weight:800;cursor:pointer;transition:all 0.2s;text-align:center;}
+    .tafel-btn.actief{background:linear-gradient(135deg,#a78bfa,#38bdf8);border-color:transparent;color:white;transform:scale(1.05);}
+    .tafel-btn.mix-btn{grid-column:span 2;background:linear-gradient(135deg,rgba(167,139,250,0.2),rgba(56,189,248,0.2));border-color:rgba(167,139,250,0.4);}
+    .tafel-btn.mix-btn.actief{background:linear-gradient(135deg,#a78bfa,#38bdf8);}
+    .modus-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:20px;}
+    .modus-btn{background:rgba(255,255,255,0.08);border:2px solid rgba(255,255,255,0.15);border-radius:14px;padding:12px 8px;color:white;font-size:0.82rem;font-weight:700;cursor:pointer;transition:all 0.2s;text-align:center;}
+    .modus-btn.actief{background:linear-gradient(135deg,#f59e0b,#ef4444);border-color:transparent;}
+    .modus-btn .e{font-size:1.3rem;display:block;margin-bottom:3px;}
+    .start-btn{width:100%;background:linear-gradient(135deg,#a78bfa,#38bdf8);border:none;border-radius:16px;padding:16px;color:white;font-size:1rem;font-weight:900;cursor:pointer;box-shadow:0 4px 20px rgba(167,139,250,0.3);}
+    .start-btn:active{transform:scale(0.97);}
+    #spel{width:100%;max-width:500px;display:none;}
+    .timer-wrap{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+    .timer{font-size:2rem;font-weight:900;color:#ffd700;font-variant-numeric:tabular-nums;}
+    .timer.rood{color:#ef4444;animation:pulse 0.5s infinite alternate;}
+    @keyframes pulse{from{opacity:1}to{opacity:0.5}}
+    .score-bar{display:flex;gap:10px;margin-bottom:10px;}
+    .score-blok{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.12);border-radius:12px;padding:10px;text-align:center;flex:1;}
+    .score-getal{font-size:1.3rem;font-weight:900;color:#a78bfa;}
+    .score-label{font-size:0.65rem;color:rgba(255,255,255,0.5);}
+    .som-kaart{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:24px;padding:28px 20px;text-align:center;margin-bottom:14px;min-height:130px;display:flex;flex-direction:column;justify-content:center;align-items:center;}
+    .som-label{font-size:0.75rem;color:rgba(255,255,255,0.5);margin-bottom:8px;text-transform:uppercase;letter-spacing:1px;}
+    .som-tekst{font-size:2.8rem;font-weight:900;}
+    .input-wrap{display:flex;gap:10px;margin-bottom:10px;}
+    .ainput{flex:1;background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.2);border-radius:14px;padding:14px;color:white;font-size:1.3rem;font-weight:700;text-align:center;outline:none;-webkit-appearance:none;font-family:'Nunito',sans-serif;}
+    .ainput:focus{border-color:#a78bfa;}
+    .ainput.goed{border-color:#10b981;background:rgba(16,185,129,0.15);}
+    .ainput.fout{border-color:#ef4444;background:rgba(239,68,68,0.1);}
+    .check-btn{background:linear-gradient(135deg,#a78bfa,#38bdf8);border:none;border-radius:14px;padding:14px 18px;color:white;font-size:1.1rem;font-weight:900;cursor:pointer;min-width:56px;}
+    .check-btn:active{transform:scale(0.93);}
+    .feedback{background:rgba(255,255,255,0.06);border-radius:14px;padding:12px;text-align:center;font-size:0.9rem;font-weight:700;min-height:46px;display:flex;align-items:center;justify-content:center;margin-bottom:10px;}
+    .feedback.goed{background:rgba(16,185,129,0.15);color:#10b981;border:1px solid rgba(16,185,129,0.3);}
+    .feedback.fout{background:rgba(239,68,68,0.1);color:#fca5a5;border:1px solid rgba(239,68,68,0.2);}
+    .stop-btn{background:transparent;border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:10px;color:rgba(255,255,255,0.4);font-size:0.8rem;cursor:pointer;width:100%;margin-top:4px;}
+    .eindscherm{background:rgba(255,255,255,0.08);border:1px solid rgba(255,255,255,0.15);border-radius:24px;padding:28px;text-align:center;display:none;width:100%;max-width:500px;}
+    .eindtitel{font-size:1.8rem;font-weight:900;margin-bottom:8px;}
+    .eindcijfer{font-size:3.5rem;font-weight:900;color:#ffd700;margin:16px 0;}
+    .eindtekst{color:rgba(255,255,255,0.6);margin-bottom:24px;font-weight:700;}
+    .opnieuw-btn{background:linear-gradient(135deg,#a78bfa,#38bdf8);border:none;border-radius:16px;padding:16px;color:white;font-size:1rem;font-weight:700;cursor:pointer;width:100%;font-family:'Nunito',sans-serif;}
+    @keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+    @keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+    .bounce{animation:bounce 0.35s ease;}
+    .shake{animation:shake 0.3s ease;}
+    .confetti-c{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:99;}
+    .confetti-s{position:absolute;width:9px;height:9px;border-radius:2px;animation:val 1s ease-out forwards;}
+    @keyframes val{0%{top:-20px;opacity:1}100%{top:110vh;opacity:0}}
+
+    /* ── BEER ACHTERGROND ── */
+    .beer-bg{position:fixed;bottom:-40px;right:-300px;font-size:10rem;pointer-events:none;z-index:0;transition:right 0.9s cubic-bezier(.34,1.56,.64,1),font-size 0.9s cubic-bezier(.34,1.56,.64,1),opacity 0.6s;opacity:0;animation:beerRennen 1s ease-in-out infinite;user-select:none;filter:drop-shadow(0 0 30px rgba(239,68,68,0));}
+    @keyframes beerRennen{0%,100%{transform:translateY(0) rotate(-4deg) scaleX(-1)}50%{transform:translateY(-22px) rotate(4deg) scaleX(-1)}}
+    .beer-bg.l1{right:20px;font-size:9rem;opacity:0.09;animation-duration:1s;}
+    .beer-bg.l2{right:10px;font-size:15rem;opacity:0.14;animation-duration:0.65s;filter:drop-shadow(0 0 20px rgba(239,68,68,0.1));}
+    .beer-bg.l3{right:-20px;font-size:22rem;opacity:0.2;animation-duration:0.4s;filter:drop-shadow(0 0 40px rgba(239,68,68,0.2));}
+    .beer-bg.l4{right:-40px;font-size:32rem;opacity:0.3;animation-duration:0.2s;filter:drop-shadow(0 0 60px rgba(239,68,68,0.35));}
+
+    /* ── BEER METER ── */
+    .beer-meter{background:rgba(255,255,255,0.07);border:2px solid rgba(255,255,255,0.12);border-radius:20px;padding:12px 16px;margin-bottom:10px;display:flex;align-items:center;gap:10px;transition:all 0.3s;}
+    .beer-meter.gevaar-1{border-color:rgba(251,191,36,0.4);background:rgba(251,191,36,0.06);}
+    .beer-meter.gevaar-2{border-color:rgba(249,115,22,0.5);background:rgba(249,115,22,0.08);}
+    .beer-meter.gevaar-3{border-color:rgba(239,68,68,0.6);background:rgba(239,68,68,0.1);}
+    .beer-meter.gevaar-4{border-color:rgba(239,68,68,0.9);background:rgba(239,68,68,0.15);animation:beerShake 0.4s infinite;}
+    @keyframes beerShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+    .beer-speler{font-size:1.6rem;transition:all 0.3s;}
+    .beer-poten{display:flex;gap:3px;flex:1;justify-content:center;}
+    .beer-poot{font-size:1.1rem;opacity:0.15;transition:all 0.3s;}
+    .beer-poot.actief{opacity:1;transform:scale(1.2);filter:drop-shadow(0 0 4px #ef4444);}
+    .beer-char{font-size:1.8rem;transition:all 0.4s;}
+    .beer-char.boos{animation:beerBoos 0.5s ease-in-out infinite;}
+    @keyframes beerBoos{0%,100%{transform:scale(1) rotate(-5deg)}50%{transform:scale(1.15) rotate(5deg)}}
+    .beer-bubble{font-size:0.7rem;font-weight:800;background:white;color:#333;border-radius:10px;padding:3px 8px;position:relative;white-space:nowrap;}
+    .beer-bubble::after{content:'';position:absolute;left:-5px;top:50%;transform:translateY(-50%);border:5px solid transparent;border-right-color:white;}
+
+    /* ── GEPAKT OVERLAY ── */
+    .gepakt-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.85);z-index:1000;display:none;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center;}
+    .gepakt-overlay.zichtbaar{display:flex;}
+    .gepakt-beer{font-size:7rem;animation:beerKom 0.6s cubic-bezier(.34,1.56,.64,1);}
+    @keyframes beerKom{0%{transform:scale(0) rotate(-20deg)}100%{transform:scale(1) rotate(0deg)}}
+    .gepakt-titel{font-size:2.2rem;font-weight:900;color:#ef4444;margin:16px 0 8px;text-shadow:0 3px 10px rgba(239,68,68,0.5);}
+    .gepakt-sub{font-size:1rem;font-weight:700;color:rgba(255,255,255,0.7);margin-bottom:8px;}
+    .gepakt-score{font-size:1.3rem;font-weight:900;color:#ffd700;margin-bottom:24px;}
+    .gepakt-tip{background:rgba(255,255,255,0.08);border-radius:16px;padding:12px 18px;font-size:0.85rem;font-weight:700;color:rgba(255,255,255,0.6);margin-bottom:24px;max-width:320px;}
+    .gepakt-btn{background:linear-gradient(135deg,#a78bfa,#38bdf8);border:none;border-radius:16px;padding:16px 32px;color:white;font-size:1rem;font-weight:900;cursor:pointer;margin-bottom:12px;width:100%;max-width:280px;font-family:'Nunito',sans-serif;}
+    .gepakt-btn2{background:transparent;border:2px solid rgba(255,255,255,0.2);border-radius:16px;padding:12px 32px;color:rgba(255,255,255,0.5);font-size:0.85rem;font-weight:700;cursor:pointer;width:100%;max-width:280px;font-family:'Nunito',sans-serif;}
+  </style>
+</head>
+<body>
+<a href="/" class="terug">← Terug naar LerenLand</a>
+<div class="header">
+  <div class="logo">🐯</div>
+  <div class="titel">TafelTijger</div>
+</div>
+
+<div class="card" id="setup">
+  <div class="vraag">Welke tafel wil je oefenen?</div>
+  <div class="tafel-grid">
+    <button class="tafel-btn" onclick="kiesT(1,this)">1×</button>
+    <button class="tafel-btn" onclick="kiesT(2,this)">2×</button>
+    <button class="tafel-btn" onclick="kiesT(3,this)">3×</button>
+    <button class="tafel-btn" onclick="kiesT(4,this)">4×</button>
+    <button class="tafel-btn" onclick="kiesT(5,this)">5×</button>
+    <button class="tafel-btn" onclick="kiesT(6,this)">6×</button>
+    <button class="tafel-btn" onclick="kiesT(7,this)">7×</button>
+    <button class="tafel-btn" onclick="kiesT(8,this)">8×</button>
+    <button class="tafel-btn" onclick="kiesT(9,this)">9×</button>
+    <button class="tafel-btn" onclick="kiesT(10,this)">10×</button>
+    <button class="tafel-btn mix-btn" onclick="kiesT(0,this)" style="grid-column:span 5">🎲 Alle tafels</button>
+  </div>
+  <div class="vraag">Modus</div>
+  <div class="modus-grid">
+    <button class="modus-btn" onclick="kiesM(60,this)"><span class="e">🐢</span>Rustig<br><small>60 sec</small></button>
+    <button class="modus-btn" onclick="kiesM(30,this)"><span class="e">⚡</span>Snel<br><small>30 sec</small></button>
+    <button class="modus-btn" onclick="kiesM(15,this)"><span class="e">🔥</span>Turbo<br><small>15 sec</small></button>
+  </div>
+  <button class="start-btn" onclick="start()">🐯 Start!</button>
+</div>
+
+<div id="spel">
+  <div class="timer-wrap">
+    <div class="score-bar" style="flex:1;margin:0;margin-right:12px;">
+      <div class="score-blok"><div class="score-getal" id="sg">0</div><div class="score-label">✅ Goed</div></div>
+      <div class="score-blok"><div class="score-getal" id="sf" style="color:#ef4444">0</div><div class="score-label">❌ Fout</div></div>
+    </div>
+    <div class="timer" id="timer">60</div>
+  </div>
+
+  <!-- BEER METER -->
+  <div class="beer-meter" id="beer-meter">
+    <div class="beer-speler" id="beer-speler">🏃</div>
+    <div class="beer-poten">
+      <span class="beer-poot" id="bp0">🐾</span>
+      <span class="beer-poot" id="bp1">🐾</span>
+      <span class="beer-poot" id="bp2">🐾</span>
+      <span class="beer-poot" id="bp3">🐾</span>
+      <span class="beer-poot" id="bp4">🐾</span>
+    </div>
+    <div class="beer-bubble" id="beer-bubble">Zzz...</div>
+    <div class="beer-char" id="beer-char">🐻</div>
+  </div>
+
+  <div class="som-kaart" id="sk">
+    <div class="som-label" id="sl">Tafel</div>
+    <div class="som-tekst" id="st">...</div>
+  </div>
+  <div class="input-wrap">
+    <input type="number" inputmode="numeric" class="ainput" id="ai" placeholder="?" autocomplete="off" onkeydown="if(event.key==='Enter')check()">
+    <button class="check-btn" id="cb" onclick="check()">✓</button>
+  </div>
+  <div class="feedback" id="fb"></div>
+  <button class="stop-btn" onclick="stopSpel()">✕ Stoppen</button>
+</div>
+
+<div class="eindscherm" id="eind">
+  <div class="eindtitel">⏰ Tijd is op!</div>
+  <div class="eindcijfer" id="eindscore">0</div>
+  <div class="eindtekst" id="eindtekst">Goed gedaan!</div>
+  <button class="opnieuw-btn" onclick="opnieuw()">🔄 Opnieuw</button>
+  <br><br>
+  <a href="/" style="color:rgba(255,255,255,0.4);font-size:0.82rem;text-decoration:none;font-weight:700;">← Terug naar LerenLand</a>
+</div>
+
+<!-- GEPAKT OVERLAY -->
+<div class="gepakt-overlay" id="gepakt-overlay">
+  <div class="gepakt-beer">🐻</div>
+  <div class="gepakt-titel">GEPAKT! 🐾</div>
+  <div class="gepakt-sub">De beer was sneller dan jij!</div>
+  <div class="gepakt-score" id="gepakt-score"></div>
+  <div class="gepakt-tip">💡 Tip: 3 goede antwoorden op een rij = beer loopt weg!</div>
+  <button class="gepakt-btn" onclick="herstart()">🐯 Opnieuw proberen!</button>
+  <button class="gepakt-btn2" onclick="window.location='/'">← Terug naar LerenLand</button>
+</div>
+
+<div class="beer-bg" id="beer-bg">🐻</div>
+<div id="cc" class="confetti-c"></div>
+
+<script>
+let tafel=null,modus=null,goed=0,fout=0,timerVal=0,timerInterval=null,hsom=null,beantwoord=false;
+let beerDreiging=0,beerStreak=0;
+const BEER_TEKST=['Zzz...','Hmm...?','Ik ruik je!','Bijna...! 💨','RAAAARRR!! 🐻'];
+
+function kiesT(t,b){tafel=t;document.querySelectorAll('.tafel-btn').forEach(x=>x.classList.remove('actief'));b.classList.add('actief');}
+function kiesM(m,b){modus=m;document.querySelectorAll('.modus-btn').forEach(x=>x.classList.remove('actief'));b.classList.add('actief');}
+
+function start(){
+  if(tafel===null){alert('Kies een tafel!');return;}
+  if(!modus){alert('Kies een modus!');return;}
+  goed=0;fout=0;timerVal=modus;beerDreiging=0;beerStreak=0;
+  document.getElementById('setup').style.display='none';
+  document.getElementById('eind').style.display='none';
+  document.getElementById('spel').style.display='block';
+  document.getElementById('sg').textContent='0';
+  document.getElementById('sf').textContent='0';
+  updateBeerUI();updateTimer();
+  timerInterval=setInterval(tick,1000);
+  laad();
+}
+
+function tick(){timerVal--;updateTimer();if(timerVal<=0){clearInterval(timerInterval);eindSpel();}}
+
+function updateTimer(){
+  const t=document.getElementById('timer');
+  t.textContent=timerVal;
+  t.className=timerVal<=5?'timer rood':'timer';
+}
+
+function updateBeer(delta){
+  if(delta<0){
+    beerDreiging=Math.min(5,beerDreiging+1);beerStreak=0;
+    if(beerDreiging>=5){clearInterval(timerInterval);beerGepakt();return;}
+  } else {
+    beerStreak++;
+    if(beerStreak>=3){beerDreiging=Math.max(0,beerDreiging-1);beerStreak=0;}
+  }
+  updateBeerUI();
+}
+
+function updateBeerUI(){
+  document.getElementById('beer-meter').className='beer-meter'+(beerDreiging>0?' gevaar-'+Math.min(beerDreiging,4):'');
+  document.getElementById('beer-bubble').textContent=BEER_TEKST[Math.min(beerDreiging,4)];
+  document.getElementById('beer-char').className='beer-char'+(beerDreiging>=3?' boos':'');
+  document.getElementById('beer-speler').textContent=beerDreiging>=3?'🏃💨':'🏃';
+  document.getElementById('beer-bg').className='beer-bg'+(beerDreiging>0?' l'+Math.min(beerDreiging,4):'');
+  for(let i=0;i<5;i++){document.getElementById('bp'+i).className='beer-poot'+(i<beerDreiging?' actief':'');}
+}
+
+function beerGepakt(){
+  document.getElementById('gepakt-score').textContent=`Je had ${goed} goede antwoorden! ${goed>=5?'🌟':'💪'}`;
+  document.getElementById('gepakt-overlay').classList.add('zichtbaar');
+  if(leeftijd&&goed>0)fetch('/api/sessie-opslaan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({leeftijd,spel:'tafels',goed})});
+}
+
+function herstart(){
+  document.getElementById('gepakt-overlay').classList.remove('zichtbaar');
+  document.getElementById('eind').style.display='none';
+  document.getElementById('spel').style.display='none';
+  document.getElementById('setup').style.display='block';
+}
+
+async function laad(){
+  beantwoord=false;hsom=null;
+  const ai=document.getElementById('ai');
+  ai.value='';ai.className='ainput';ai.disabled=false;
+  document.getElementById('cb').disabled=false;
+  document.getElementById('fb').className='feedback';document.getElementById('fb').textContent='';
+  document.getElementById('st').textContent='...';
+  const t=tafel===0?Math.floor(Math.random()*10)+1:tafel;
+  document.getElementById('sl').textContent=`Tafel van ${t}`;
+  const r=await fetch('/api/tafel-vraag',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({tafel:t})});
+  hsom=await r.json();
+  document.getElementById('st').textContent=hsom.vraag;
+  setTimeout(()=>ai.focus(),50);
+}
+
+function check(){
+  if(beantwoord||!hsom||timerVal<=0)return;
+  const ai=document.getElementById('ai');
+  const val=parseInt(ai.value);
+  if(isNaN(val))return;
+  beantwoord=true;document.getElementById('cb').disabled=true;ai.disabled=true;
+  const ok=val===hsom.antwoord;
+  const fb=document.getElementById('fb');
+  if(ok){
+    goed++;ai.className='ainput goed';fb.className='feedback goed';fb.textContent='✅ Correct!';
+    document.getElementById('sk').classList.add('bounce');setTimeout(()=>document.getElementById('sk').classList.remove('bounce'),350);
+    if(goed%5===0)confetti();
+    updateBeer(1);
+  } else {
+    fout++;ai.className='ainput fout';fb.className='feedback fout';fb.textContent=`❌ Het was ${hsom.antwoord}`;
+    document.getElementById('sk').classList.add('shake');setTimeout(()=>document.getElementById('sk').classList.remove('shake'),300);
+    updateBeer(-1);
+  }
+  document.getElementById('sg').textContent=goed;
+  document.getElementById('sf').textContent=fout;
+  setTimeout(()=>{if(timerVal>0)laad();},700);
+}
+
+function stopSpel(){clearInterval(timerInterval);eindSpel();}
+
+function eindSpel(){
+  document.getElementById('spel').style.display='none';
+  document.getElementById('eind').style.display='block';
+  document.getElementById('eindscore').textContent=`${goed} ✅`;
+  const pct=goed+fout>0?Math.round(goed/(goed+fout)*100):0;
+  let tekst='';
+  if(pct===100)tekst='Perfect! Je bent een echte TafelTijger! 🐯🏆';
+  else if(pct>=80)tekst=`Wauw! ${pct}% goed — super knap! ⭐`;
+  else if(pct>=60)tekst=`${pct}% goed — goed bezig! Blijf oefenen! 💪`;
+  else tekst=`${pct}% goed — nog even oefenen en je komt er! 🌱`;
+  document.getElementById('eindtekst').textContent=tekst;
+  if(pct>=80)confetti();
+}
+
+function opnieuw(){document.getElementById('eind').style.display='none';document.getElementById('setup').style.display='block';}
+
+function confetti(){
+  const c=document.getElementById('cc');const kl=['#a78bfa','#38bdf8','#ffd700','#10b981','#f43f5e'];
+  for(let i=0;i<25;i++){const s=document.createElement('div');s.className='confetti-s';s.style.left=Math.random()*100+'vw';s.style.background=kl[Math.floor(Math.random()*kl.length)];s.style.animationDuration=(0.7+Math.random()*0.8)+'s';s.style.animationDelay=Math.random()*0.3+'s';c.appendChild(s);setTimeout(()=>s.remove(),1500);}
+}
+</script>
+</body>
+</html>

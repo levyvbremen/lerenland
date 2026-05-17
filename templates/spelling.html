@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+  <title>SpellingBij 🐝</title>
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    *{box-sizing:border-box;margin:0;padding:0;}
+    body{font-family:'Nunito',system-ui,sans-serif;background:linear-gradient(160deg,#0f4c75 0%,#1b7a4a 100%);min-height:100vh;color:white;display:flex;flex-direction:column;align-items:center;padding:16px 16px 40px;overflow-x:hidden;}
+
+    .terug{display:flex;align-items:center;gap:8px;color:rgba(255,255,255,0.6);text-decoration:none;font-size:0.85rem;margin-bottom:16px;align-self:flex-start;font-weight:700;}
+    .terug:hover{color:white;}
+
+    /* ── SETUP ── */
+    #setup{width:100%;max-width:460px;}
+    .setup-header{text-align:center;margin-bottom:24px;}
+    .setup-bij{font-size:5rem;display:block;animation:bob 1.5s ease-in-out infinite;}
+    @keyframes bob{0%,100%{transform:translateY(0) rotate(-5deg)}50%{transform:translateY(-14px) rotate(5deg)}}
+    .setup-titel{font-size:2.4rem;font-weight:900;margin-top:8px;text-shadow:0 3px 0 rgba(0,0,0,0.2);}
+    .setup-sub{font-size:1rem;font-weight:700;color:rgba(255,255,255,0.7);margin-top:4px;}
+
+    .uitleg-kaart{background:rgba(255,255,255,0.12);border:2px solid rgba(255,255,255,0.2);border-radius:24px;padding:20px;margin-bottom:16px;}
+    .uitleg-titel{font-size:1rem;font-weight:900;margin-bottom:14px;text-align:center;color:#ffd700;}
+    .stap{display:flex;align-items:center;gap:14px;margin-bottom:12px;}
+    .stap:last-child{margin-bottom:0;}
+    .stap-nr{background:linear-gradient(135deg,#34d399,#38bdf8);border-radius:50%;width:40px;height:40px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:900;color:#0f4c75;flex-shrink:0;}
+    .stap-tekst{font-size:0.95rem;font-weight:700;line-height:1.4;}
+    .stap-tekst strong{color:#ffd700;}
+
+    .lt-label{font-size:0.9rem;font-weight:800;color:rgba(255,255,255,0.7);margin-bottom:10px;text-align:center;}
+    .leeftijd-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:16px;}
+    .leeftijd-btn{background:rgba(255,255,255,0.1);border:2px solid rgba(255,255,255,0.2);border-radius:14px;padding:14px 6px;color:white;font-size:1.1rem;font-weight:800;cursor:pointer;transition:all 0.2s;font-family:'Nunito',sans-serif;}
+    .leeftijd-btn.actief{background:linear-gradient(135deg,#34d399,#38bdf8);border-color:transparent;color:#0f4c75;transform:scale(1.08);}
+    .leeftijd-btn:hover{transform:scale(1.05);}
+    .start-btn{width:100%;background:linear-gradient(135deg,#34d399,#38bdf8);border:none;border-radius:18px;padding:18px;color:#0f4c75;font-size:1.2rem;font-weight:900;cursor:pointer;box-shadow:0 6px 0 rgba(0,0,0,0.2);font-family:'Nunito',sans-serif;}
+    .start-btn:active{transform:scale(0.97);}
+
+    /* ── SPEL ── */
+    #spel{width:100%;max-width:460px;display:none;}
+
+    /* BEER METER */
+    .beer-meter{border-radius:18px;padding:10px 14px;margin-bottom:12px;display:flex;align-items:center;gap:8px;transition:all 0.3s;background:rgba(255,255,255,0.07);border:2px solid rgba(255,255,255,0.1);}
+    .beer-meter.gevaar-1{border-color:rgba(251,191,36,0.5);background:rgba(251,191,36,0.07);}
+    .beer-meter.gevaar-2{border-color:rgba(249,115,22,0.6);background:rgba(249,115,22,0.09);}
+    .beer-meter.gevaar-3{border-color:rgba(239,68,68,0.7);background:rgba(239,68,68,0.11);}
+    .beer-meter.gevaar-4{border-color:rgba(239,68,68,1);background:rgba(239,68,68,0.16);animation:meterShake 0.4s infinite;}
+    @keyframes meterShake{0%,100%{transform:translateX(0)}25%{transform:translateX(-3px)}75%{transform:translateX(3px)}}
+    .beer-speler{font-size:1.5rem;}
+    .beer-poten{display:flex;gap:2px;flex:1;justify-content:center;}
+    .beer-poot{font-size:1rem;opacity:0.15;transition:all 0.3s;}
+    .beer-poot.actief{opacity:1;transform:scale(1.2);filter:drop-shadow(0 0 4px #ef4444);}
+    .beer-bubble{font-size:0.68rem;font-weight:800;background:white;color:#333;border-radius:8px;padding:3px 8px;position:relative;white-space:nowrap;}
+    .beer-bubble::after{content:'';position:absolute;left:-5px;top:50%;transform:translateY(-50%);border:5px solid transparent;border-right-color:white;}
+    .beer-char{font-size:1.7rem;transition:all 0.4s;}
+    .beer-char.boos{animation:beerBoos 0.5s ease-in-out infinite;}
+    @keyframes beerBoos{0%,100%{transform:scale(1) rotate(-5deg)}50%{transform:scale(1.15) rotate(5deg)}}
+
+    /* SCORES */
+    .score-bar{display:flex;gap:8px;margin-bottom:14px;}
+    .score-blok{background:rgba(255,255,255,0.1);border-radius:14px;padding:10px;text-align:center;flex:1;}
+    .score-getal{font-size:1.5rem;font-weight:900;color:#34d399;}
+    .score-label{font-size:0.65rem;color:rgba(255,255,255,0.55);font-weight:800;text-transform:uppercase;letter-spacing:0.5px;}
+
+    /* ── FASE 1: KIJK & LUISTER ── */
+    #fase-kijk{display:none;}
+    .fase-label{font-size:0.75rem;font-weight:900;text-transform:uppercase;letter-spacing:1.5px;color:#38bdf8;text-align:center;margin-bottom:10px;}
+    .woord-toon{background:white;border-radius:24px;padding:30px 20px 24px;text-align:center;box-shadow:0 8px 0 rgba(0,0,0,0.15);margin-bottom:14px;}
+    .woord-groot{font-size:3.2rem;font-weight:900;color:#0f4c75;letter-spacing:2px;display:block;margin-bottom:10px;animation:woordPop 0.5s cubic-bezier(.34,1.56,.64,1);}
+    @keyframes woordPop{0%{transform:scale(0.5);opacity:0}100%{transform:scale(1);opacity:1}}
+    .woord-omschrijving{font-size:0.9rem;font-weight:700;color:#64748b;margin-bottom:16px;line-height:1.4;}
+    .herlees-btn{background:linear-gradient(135deg,#667eea,#764ba2);border:none;border-radius:12px;padding:10px 20px;color:white;font-size:0.9rem;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;}
+    .herlees-btn:active{transform:scale(0.95);}
+
+    .klaar-sectie{background:rgba(255,255,255,0.1);border-radius:20px;padding:16px;text-align:center;margin-bottom:10px;}
+    .klaar-tekst{font-size:0.9rem;font-weight:700;margin-bottom:12px;color:rgba(255,255,255,0.85);}
+    .countdown{font-size:2.5rem;font-weight:900;color:#ffd700;display:block;margin-bottom:10px;line-height:1;}
+    .klaar-btn{background:linear-gradient(135deg,#34d399,#38bdf8);border:none;border-radius:16px;padding:14px 28px;color:#0f4c75;font-size:1.1rem;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;box-shadow:0 4px 0 rgba(0,0,0,0.15);}
+    .klaar-btn:active{transform:scale(0.96);}
+
+    /* ── FASE 2: SPEL HET ── */
+    #fase-spel{display:none;}
+    .woord-weg{background:white;border-radius:24px;padding:24px 20px;text-align:center;box-shadow:0 8px 0 rgba(0,0,0,0.15);margin-bottom:14px;}
+    .blanks-rij{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:12px;}
+    .blank{min-width:32px;height:40px;border-bottom:4px solid #34d399;display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:900;color:#0f4c75;padding:0 4px;transition:all 0.15s;}
+    .blank.ingevuld{border-bottom-color:#38bdf8;}
+    .blank.goed-char{border-bottom-color:#10b981;color:#10b981;}
+    .blank.fout-char{border-bottom-color:#ef4444;color:#ef4444;}
+    .hint-omschrijving{font-size:0.85rem;font-weight:700;color:#64748b;margin-bottom:6px;}
+    .hint-knop{background:rgba(102,126,234,0.12);border:2px solid rgba(102,126,234,0.3);border-radius:10px;padding:6px 14px;color:#667eea;font-size:0.8rem;font-weight:800;cursor:pointer;font-family:'Nunito',sans-serif;}
+    .hint-knop:active{transform:scale(0.95);}
+
+    .input-sectie{background:rgba(255,255,255,0.1);border-radius:20px;padding:14px;margin-bottom:12px;border:2px solid rgba(255,255,255,0.15);}
+    .input-label{font-size:0.8rem;font-weight:900;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:1px;margin-bottom:8px;}
+    .input-rij{display:flex;gap:10px;}
+    .ainput{flex:1;background:white;border:3px solid transparent;border-radius:14px;padding:14px 16px;color:#1a2e3b;font-size:1.3rem;font-weight:800;text-align:center;outline:none;-webkit-appearance:none;font-family:'Nunito',sans-serif;}
+    .ainput:focus{border-color:#34d399;}
+    .ainput.goed{border-color:#10b981;background:#ecfdf5;}
+    .ainput.fout{border-color:#ef4444;background:#fff5f5;}
+    .check-btn{background:linear-gradient(135deg,#34d399,#38bdf8);border:none;border-radius:14px;padding:14px 20px;color:#0f4c75;font-size:1.3rem;font-weight:900;cursor:pointer;font-family:'Nunito',sans-serif;}
+    .check-btn:active{transform:scale(0.93);}
+    .check-btn:disabled{opacity:0.4;}
+
+    .feedback{border-radius:16px;padding:14px 16px;text-align:center;font-size:1rem;font-weight:800;min-height:52px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;gap:8px;line-height:1.4;}
+    .feedback.wacht{background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.4);font-size:0.85rem;}
+    .feedback.goed{background:rgba(16,185,129,0.2);color:#34d399;border:2px solid rgba(52,211,153,0.35);}
+    .feedback.fout{background:rgba(239,68,68,0.15);color:#fca5a5;border:2px solid rgba(239,68,68,0.3);}
+
+    .volgende-btn{width:100%;background:linear-gradient(135deg,#34d399,#38bdf8);border:none;border-radius:16px;padding:16px;color:#0f4c75;font-size:1.05rem;font-weight:900;cursor:pointer;margin-bottom:8px;display:none;font-family:'Nunito',sans-serif;box-shadow:0 4px 0 rgba(0,0,0,0.15);}
+    .volgende-btn:active{transform:scale(0.97);}
+    .stop-btn{background:transparent;border:2px solid rgba(255,255,255,0.2);border-radius:12px;padding:10px;color:rgba(255,255,255,0.45);font-size:0.82rem;cursor:pointer;width:100%;font-family:'Nunito',sans-serif;font-weight:700;margin-top:4px;}
+
+    /* GEPAKT */
+    .gepakt-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.88);z-index:1000;display:none;flex-direction:column;align-items:center;justify-content:center;padding:30px;text-align:center;}
+    .gepakt-overlay.zichtbaar{display:flex;}
+    .gepakt-beer{font-size:7rem;animation:beerKom 0.6s cubic-bezier(.34,1.56,.64,1);}
+    @keyframes beerKom{0%{transform:scale(0) rotate(-20deg)}100%{transform:scale(1) rotate(0deg)}}
+    .gepakt-titel{font-size:2.2rem;font-weight:900;color:#ef4444;margin:16px 0 8px;}
+    .gepakt-sub{font-size:1rem;font-weight:700;color:rgba(255,255,255,0.7);margin-bottom:8px;}
+    .gepakt-score{font-size:1.3rem;font-weight:900;color:#ffd700;margin-bottom:24px;}
+    .gepakt-tip{background:rgba(255,255,255,0.08);border-radius:16px;padding:12px 18px;font-size:0.85rem;font-weight:700;color:rgba(255,255,255,0.6);margin-bottom:24px;max-width:320px;}
+    .gepakt-btn{background:linear-gradient(135deg,#34d399,#38bdf8);border:none;border-radius:16px;padding:16px 32px;color:#0f4c75;font-size:1rem;font-weight:900;cursor:pointer;margin-bottom:12px;width:100%;max-width:280px;font-family:'Nunito',sans-serif;}
+    .gepakt-btn2{background:transparent;border:2px solid rgba(255,255,255,0.2);border-radius:16px;padding:12px 32px;color:rgba(255,255,255,0.5);font-size:0.85rem;font-weight:700;cursor:pointer;width:100%;max-width:280px;font-family:'Nunito',sans-serif;}
+
+    /* BEER ACHTERGROND */
+    .beer-bg{position:fixed;bottom:-40px;right:-300px;font-size:10rem;pointer-events:none;z-index:0;transition:right 0.9s cubic-bezier(.34,1.56,.64,1),font-size 0.9s cubic-bezier(.34,1.56,.64,1),opacity 0.6s;opacity:0;animation:beerRennen 1s ease-in-out infinite;user-select:none;}
+    @keyframes beerRennen{0%,100%{transform:translateY(0) rotate(-4deg) scaleX(-1)}50%{transform:translateY(-22px) rotate(4deg) scaleX(-1)}}
+    .beer-bg.l1{right:20px;font-size:9rem;opacity:0.09;}
+    .beer-bg.l2{right:10px;font-size:15rem;opacity:0.14;animation-duration:0.65s;}
+    .beer-bg.l3{right:-20px;font-size:22rem;opacity:0.2;animation-duration:0.4s;}
+    .beer-bg.l4{right:-40px;font-size:32rem;opacity:0.3;animation-duration:0.2s;}
+
+    @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-6px)}40%{transform:translateX(6px)}60%{transform:translateX(-4px)}80%{transform:translateX(4px)}}
+    .shake-anim{animation:shake 0.35s ease;}
+    .confetti-c{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:99;}
+    .confetti-s{position:absolute;width:9px;height:9px;border-radius:2px;animation:val 1s ease-out forwards;}
+    @keyframes val{0%{top:-20px;opacity:1;transform:rotate(0)}100%{top:110vh;opacity:0;transform:rotate(540deg)}}
+  </style>
+</head>
+<body>
+<a href="/" class="terug">← Terug naar LerenLand</a>
+
+<!-- ── SETUP ── -->
+<div id="setup">
+  <div class="setup-header">
+    <span class="setup-bij">🐝</span>
+    <div class="setup-titel">SpellingBij</div>
+    <div class="setup-sub">Leer woorden goed spellen!</div>
+  </div>
+
+  <div class="uitleg-kaart">
+    <div class="uitleg-titel">⭐ Zo werkt het spel:</div>
+    <div class="stap">
+      <div class="stap-nr">👁️</div>
+      <div class="stap-tekst">Je ziet een woord op het scherm — <strong>lees het goed!</strong></div>
+    </div>
+    <div class="stap">
+      <div class="stap-nr">🔊</div>
+      <div class="stap-tekst">Het woord wordt ook <strong>hardop voorgelezen</strong> — luister goed!</div>
+    </div>
+    <div class="stap">
+      <div class="stap-nr">🫣</div>
+      <div class="stap-tekst">Dan <strong>verdwijnt het woord</strong> — kun jij het nog onthouden?</div>
+    </div>
+    <div class="stap">
+      <div class="stap-nr">✏️</div>
+      <div class="stap-tekst">Typ het woord <strong>zo goed mogelijk!</strong> Let op de spelling!</div>
+    </div>
+  </div>
+
+  <div class="lt-label">Hoe oud ben jij?</div>
+  <div class="leeftijd-grid">
+    <button class="leeftijd-btn" onclick="kiesL(6,this)">6</button>
+    <button class="leeftijd-btn" onclick="kiesL(7,this)">7</button>
+    <button class="leeftijd-btn" onclick="kiesL(8,this)">8</button>
+    <button class="leeftijd-btn" onclick="kiesL(9,this)">9</button>
+    <button class="leeftijd-btn" onclick="kiesL(10,this)">10</button>
+    <button class="leeftijd-btn" onclick="kiesL(11,this)">11</button>
+    <button class="leeftijd-btn" onclick="kiesL(12,this)">12</button>
+  </div>
+  <button class="start-btn" onclick="start()">🐝 Start het spel!</button>
+</div>
+
+<!-- ── GEPAKT ── -->
+<div class="gepakt-overlay" id="gepakt-overlay">
+  <div class="gepakt-beer">🐻</div>
+  <div class="gepakt-titel">GEPAKT! 🐾</div>
+  <div class="gepakt-sub">De beer heeft je te pakken!</div>
+  <div class="gepakt-score" id="gepakt-score"></div>
+  <div class="gepakt-tip">💡 Tip: 3 goede woorden op een rij = beer loopt weg!</div>
+  <button class="gepakt-btn" onclick="herstart()">🐝 Opnieuw proberen!</button>
+  <button class="gepakt-btn2" onclick="window.location='/'">← Terug naar LerenLand</button>
+</div>
+
+<!-- ── SPEL ── -->
+<div id="spel">
+  <!-- Beer meter -->
+  <div class="beer-meter" id="beer-meter">
+    <div class="beer-speler" id="beer-speler">🏃</div>
+    <div class="beer-poten">
+      <span class="beer-poot" id="bp0">🐾</span>
+      <span class="beer-poot" id="bp1">🐾</span>
+      <span class="beer-poot" id="bp2">🐾</span>
+      <span class="beer-poot" id="bp3">🐾</span>
+      <span class="beer-poot" id="bp4">🐾</span>
+    </div>
+    <div class="beer-bubble" id="beer-bubble">Zzz...</div>
+    <div class="beer-char" id="beer-char">🐻</div>
+  </div>
+
+  <!-- Scores -->
+  <div class="score-bar">
+    <div class="score-blok"><div class="score-getal" id="sg">0</div><div class="score-label">✅ Goed</div></div>
+    <div class="score-blok"><div class="score-getal" id="sf" style="color:#ef4444">0</div><div class="score-label">❌ Fout</div></div>
+    <div class="score-blok"><div class="score-getal" id="ss" style="color:#ffd700">0</div><div class="score-label">🔥 Reeks</div></div>
+  </div>
+
+  <!-- FASE 1: kijk en luister -->
+  <div id="fase-kijk">
+    <div class="fase-label">👁️ Fase 1 — Kijk goed naar het woord!</div>
+    <div class="woord-toon">
+      <span class="woord-groot" id="woord-toon-tekst">...</span>
+      <div class="woord-omschrijving" id="woord-toon-omschrijving"></div>
+      <button class="herlees-btn" onclick="leesVoor()">🔊 Lees nog een keer voor</button>
+    </div>
+    <div class="klaar-sectie">
+      <div class="klaar-tekst">Het woord verdwijnt automatisch over:</div>
+      <span class="countdown" id="countdown">5</span>
+      <button class="klaar-btn" onclick="startFaseSpel()">✏️ Ik weet het — typ het woord!</button>
+    </div>
+  </div>
+
+  <!-- FASE 2: typ het woord -->
+  <div id="fase-spel">
+    <div class="fase-label">✏️ Fase 2 — Typ het woord dat je net zag!</div>
+    <div class="woord-weg">
+      <div class="blanks-rij" id="blanks-rij"></div>
+      <div class="hint-omschrijving" id="hint-omschrijving" style="display:none"></div>
+      <button class="hint-knop" id="hint-knop" onclick="toonHint()">💡 Geef een hint (omschrijving)</button>
+    </div>
+
+    <div class="input-sectie">
+      <div class="input-label">✏️ Schrijf het woord hier:</div>
+      <div class="input-rij">
+        <input type="text" class="ainput" id="ai" placeholder="Typ hier..." autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false" oninput="updateBlanks()" onkeydown="if(event.key==='Enter')check()">
+        <button class="check-btn" id="cb" onclick="check()">✓</button>
+      </div>
+    </div>
+
+    <div class="feedback wacht" id="fb">👆 Typ het woord dat je net zag en druk op ✓</div>
+    <button class="volgende-btn" id="vb" onclick="laad()">➡️ Volgend woord!</button>
+    <button class="stop-btn" onclick="gaNaarSetup()">← Andere leeftijd kiezen</button>
+  </div>
+</div>
+
+<div class="beer-bg" id="beer-bg">🐻</div>
+<div id="cc" class="confetti-c"></div>
+
+<script>
+let leeftijd=null, goed=0, fout=0, streak=0, hwoord=null, beantwoord=false;
+let countdownTimer=null;
+let beerDreiging=0, beerStreak=0;
+const BEER_TEKST=['Zzz...','Hmm...?','Ik ruik je!','Bijna...! 💨','RAAAARRR!! 🐻'];
+
+function kiesL(l,b){
+  leeftijd=l;
+  document.querySelectorAll('.leeftijd-btn').forEach(x=>x.classList.remove('actief'));
+  b.classList.add('actief');
+}
+
+function start(){
+  if(!leeftijd){alert('Kies eerst jouw leeftijd!');return;}
+  goed=0;fout=0;streak=0;beerDreiging=0;beerStreak=0;
+  document.getElementById('setup').style.display='none';
+  document.getElementById('spel').style.display='block';
+  updateBeerUI();
+  laad();
+}
+
+function gaNaarSetup(){
+  clearInterval(countdownTimer);
+  document.getElementById('setup').style.display='block';
+  document.getElementById('spel').style.display='none';
+}
+
+// ── BEER ──
+function updateBeer(delta){
+  if(delta<0){beerDreiging=Math.min(5,beerDreiging+1);beerStreak=0;if(beerDreiging>=5){beerGepakt();return;}}
+  else{beerStreak++;if(beerStreak>=3){beerDreiging=Math.max(0,beerDreiging-1);beerStreak=0;}}
+  updateBeerUI();
+}
+function updateBeerUI(){
+  document.getElementById('beer-meter').className='beer-meter'+(beerDreiging>0?' gevaar-'+Math.min(beerDreiging,4):'');
+  document.getElementById('beer-bubble').textContent=BEER_TEKST[Math.min(beerDreiging,4)];
+  document.getElementById('beer-char').className='beer-char'+(beerDreiging>=3?' boos':'');
+  document.getElementById('beer-speler').textContent=beerDreiging>=3?'🏃💨':'🏃';
+  document.getElementById('beer-bg').className='beer-bg'+(beerDreiging>0?' l'+Math.min(beerDreiging,4):'');
+  for(let i=0;i<5;i++)document.getElementById('bp'+i).className='beer-poot'+(i<beerDreiging?' actief':'');
+}
+function beerGepakt(){
+  clearInterval(countdownTimer);
+  document.getElementById('gepakt-score').textContent=`Je had ${goed} goede woorden! ${goed>=5?'🌟':'💪'}`;
+  document.getElementById('gepakt-overlay').classList.add('zichtbaar');
+  if(leeftijd&&goed>0)fetch('/api/sessie-opslaan',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({leeftijd,spel:'spelling',goed})});
+}
+function herstart(){
+  document.getElementById('gepakt-overlay').classList.remove('zichtbaar');
+  goed=0;fout=0;streak=0;beerDreiging=0;beerStreak=0;
+  updateBeerUI();
+  document.getElementById('sg').textContent=0;
+  document.getElementById('sf').textContent=0;
+  document.getElementById('ss').textContent=0;
+  laad();
+}
+
+// ── WOORD LADEN ──
+async function laad(){
+  clearInterval(countdownTimer);
+  beantwoord=false; hwoord=null;
+
+  // Reset beide fases
+  document.getElementById('fase-kijk').style.display='none';
+  document.getElementById('fase-spel').style.display='none';
+  document.getElementById('woord-toon-tekst').textContent='Laden...';
+
+  const r=await fetch('/api/spelling-woord',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({leeftijd})});
+  const d=await r.json();
+  hwoord=d;
+
+  // Toon fase 1
+  document.getElementById('woord-toon-tekst').textContent=d.woord;
+  document.getElementById('woord-toon-omschrijving').textContent='"'+d.omschrijving+'"';
+  document.getElementById('fase-kijk').style.display='block';
+
+  // Lees voor
+  leesVoor();
+
+  // Start countdown
+  let teller=5;
+  document.getElementById('countdown').textContent=teller;
+  countdownTimer=setInterval(()=>{
+    teller--;
+    document.getElementById('countdown').textContent=teller;
+    if(teller<=0){clearInterval(countdownTimer);startFaseSpel();}
+  },1000);
+}
+
+// ── SPEECH ──
+function leesVoor(){
+  if(!hwoord||!('speechSynthesis' in window))return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(hwoord.woord);
+  u.lang='nl-NL';u.rate=0.8;u.pitch=1;
+  speechSynthesis.speak(u);
+}
+
+// ── FASE 2 ──
+function startFaseSpel(){
+  clearInterval(countdownTimer);
+  document.getElementById('fase-kijk').style.display='none';
+  document.getElementById('fase-spel').style.display='block';
+
+  const ai=document.getElementById('ai');
+  ai.value='';ai.className='ainput';ai.disabled=false;
+  document.getElementById('cb').disabled=false;
+  document.getElementById('fb').className='feedback wacht';
+  document.getElementById('fb').textContent='👆 Typ het woord dat je net zag en druk op ✓';
+  document.getElementById('vb').style.display='none';
+  document.getElementById('hint-omschrijving').style.display='none';
+  document.getElementById('hint-knop').style.display='block';
+
+  tekenBlanks(hwoord.woord.length,'','');
+  setTimeout(()=>ai.focus(),150);
+}
+
+function toonHint(){
+  document.getElementById('hint-omschrijving').textContent='💡 Omschrijving: '+hwoord.omschrijving;
+  document.getElementById('hint-omschrijving').style.display='block';
+  document.getElementById('hint-knop').style.display='none';
+}
+
+function tekenBlanks(len, getyptWoord, klasse){
+  const container=document.getElementById('blanks-rij');
+  container.innerHTML='';
+  for(let i=0;i<len;i++){
+    const b=document.createElement('div');
+    b.className='blank'+(klasse?' '+klasse:'')+(getyptWoord[i]&&!klasse?' ingevuld':'');
+    b.textContent=getyptWoord[i]||'';
+    container.appendChild(b);
+  }
+}
+
+function updateBlanks(){
+  if(!hwoord||beantwoord)return;
+  const val=document.getElementById('ai').value;
+  tekenBlanks(hwoord.woord.length, val.toLowerCase(),'');
+}
+
+// ── CONTROLEER ──
+async function check(){
+  if(beantwoord||!hwoord)return;
+  const ai=document.getElementById('ai');
+  const val=ai.value.trim();
+  if(!val){ai.focus();return;}
+  beantwoord=true;
+  document.getElementById('cb').disabled=true;
+  ai.disabled=true;
+
+  const r=await fetch('/api/spelling-controleer',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({antwoord:val,woord:hwoord.woord})});
+  const d=await r.json();
+  const fb=document.getElementById('fb');
+
+  if(d.goed){
+    goed++;streak++;
+    ai.className='ainput goed';
+    fb.className='feedback goed';
+    updateBeer(1);
+    fb.textContent=streak>=3?`🔥 ${streak} op een rij! Super goed!`:'✅ Perfect gespeld!';
+    tekenBlanks(hwoord.woord.length, hwoord.woord.toLowerCase(),'goed-char');
+    if(streak%5===0)confetti();
+    setTimeout(()=>{ if(beantwoord)laad(); },1800);
+  } else {
+    fout++;streak=0;
+    ai.className='ainput fout';
+    fb.className='feedback fout';
+    updateBeer(-1);
+    fb.innerHTML=`❌ Het goede woord is: <strong>"${d.correct}"</strong><br><span style="font-size:0.85rem;opacity:0.8">Typ het goed: letter voor letter!</span>`;
+    tekenBlanks(hwoord.woord.length, d.correct.toLowerCase(),'fout-char');
+    document.getElementById('fase-spel').classList.add('shake-anim');
+    setTimeout(()=>document.getElementById('fase-spel').classList.remove('shake-anim'),350);
+    document.getElementById('vb').style.display='block';
+  }
+
+  document.getElementById('sg').textContent=goed;
+  document.getElementById('sf').textContent=fout;
+  document.getElementById('ss').textContent=streak;
+}
+
+function confetti(){
+  const c=document.getElementById('cc');
+  const kl=['#34d399','#38bdf8','#ffd700','#f43f5e','#a78bfa'];
+  for(let i=0;i<30;i++){
+    const s=document.createElement('div');s.className='confetti-s';
+    s.style.left=Math.random()*100+'vw';
+    s.style.background=kl[Math.floor(Math.random()*kl.length)];
+    s.style.animationDuration=(0.8+Math.random()*0.9)+'s';
+    s.style.animationDelay=Math.random()*0.4+'s';
+    s.style.borderRadius=Math.random()>0.5?'50%':'3px';
+    c.appendChild(s);setTimeout(()=>s.remove(),1800);
+  }
+}
+</script>
+</body>
+</html>
